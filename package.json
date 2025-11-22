@@ -1,0 +1,19 @@
+{
+  "name": "gosuslugi-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot and web interface for order management",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "bot": "node bot.js",
+    "dev": "node server.js",
+    "dev:bot": "node bot.js"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "mongodb": "^7.0.0",
+    "node-telegram-bot-api": "^0.66.0"
+  }
+}
