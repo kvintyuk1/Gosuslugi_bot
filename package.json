@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "start:all": "./start.sh",
     "bot": "node bot.js",
     "dev": "node server.js",
     "dev:bot": "node bot.js"
