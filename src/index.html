@@ -1491,6 +1491,34 @@
       body.telegram-webview {
         overscroll-behavior: contain;
       }
+
+      /* Маскот-бот (анімований робот у правому нижньому куті) */
+      .mascot-bot {
+        position: fixed;
+        right: 32px;
+        bottom: 24px;
+        width: 96px;
+        height: 96px;
+        z-index: 4000;
+        cursor: pointer;
+        transition: transform 0.3s, filter 0.2s;
+        filter: drop-shadow(0 6px 14px rgba(11,99,206,0.10));
+        background: none;
+        border: none;
+        padding: 0;
+      }
+      .mascot-bot:hover {
+        transform: translateY(-6px) scale(1.06) rotate(-3deg);
+        filter: drop-shadow(0 16px 32px rgba(227,0,22,.15));
+      }
+      .mascot-bot svg {
+        width: 100%; height: 100%; display: block;
+        animation: mascot-wave 2.7s infinite ease-in-out;
+      }
+      @keyframes mascot-wave {
+        0%,100% { transform: rotate(-3deg); }
+        50% { transform: rotate(8deg) scale(1.045); }
+      }
     </style>
 </head>
 <body>
@@ -1872,815 +1900,74 @@
       <span id="toastMessage">Сообщение</span>
     </div>
 
-    <script>
-      // Toast notification system
-      function showToast(message, type = "success") {
-        const toast = document.getElementById("toast");
-        const toastIcon = document.getElementById("toastIcon");
-        const toastMessage = document.getElementById("toastMessage");
-
-        toast.className = `toast ${type}`;
-        toastMessage.textContent = message;
-
-        const icons = {
-          success: "✅",
-          info: "ℹ️",
-          warning: "⚠️",
-          error: "❌",
-        };
-
-        toastIcon.textContent = icons[type] || icons.success;
-        toast.classList.add("show");
-
-        setTimeout(() => {
-          toast.classList.remove("show");
-        }, 4000);
-      }
-
-      // Animated counter
-      function animateCounter(element, target, duration = 2000) {
-        const start = parseInt(element.textContent.replace(/\D/g, "")) || 0;
-        const increment = target / (duration / 16);
-        let current = start;
-
-        const timer = setInterval(() => {
-          current += increment;
-          if (current >= target) {
-            element.textContent = formatNumber(target);
-            element.classList.add("updated");
-            setTimeout(() => element.classList.remove("updated"), 500);
-            clearInterval(timer);
-          } else {
-            element.textContent = formatNumber(Math.floor(current));
-          }
-        }, 16);
-      }
-
-      function formatNumber(num) {
-        if (num >= 1000000) {
-          return (num / 1000000).toFixed(1) + " млн";
-        }
-        if (num >= 1000) {
-          return (num / 1000).toFixed(0) + " тыс";
-        }
-        return num.toString();
-      }
-
-      // Progress bar
-      function updateProgress(percent) {
-        const summary = document.getElementById("summary");
-        const progressBar = summary?.querySelector(".progress-bar");
-        if (progressBar) {
-          progressBar.style.width = percent + "%";
-        }
-      }
-
-      // API base URL - налаштування для різних середовищ
-      // Для продакшену: встановіть ваш API сервер URL тут або через змінну
-      const API_SERVER_URL = window.API_SERVER_URL || null; // Можна встановити через <script> тег
-      
-      const API_BASE_URL = (() => {
-        // Якщо встановлено явний API_SERVER_URL, використовуємо його
-        if (API_SERVER_URL) {
-          return API_SERVER_URL.endsWith('/api') ? API_SERVER_URL : `${API_SERVER_URL}/api`;
-        }
-        
-        // Отримуємо поточний origin
-        let currentOrigin = window.location.origin;
-        
-        // Якщо origin не визначено (Telegram WebView або file://), використовуємо localhost
-        if (!currentOrigin || currentOrigin === 'null' || currentOrigin === 'file://' || window.location.protocol === 'file:') {
-          return 'http://localhost:3000/api';
-        }
-        
-        // Якщо на localhost або 127.0.0.1, використовуємо localhost:3000
-        if (currentOrigin.includes('localhost') || currentOrigin.includes('127.0.0.1')) {
-          return 'http://localhost:3000/api';
-        }
-        
-        // Для Firebase Hosting (web.app) - потрібно вказати окремий API сервер
-        if (currentOrigin.includes('web.app') || currentOrigin.includes('firebaseapp.com')) {
-          // Перевіряємо, чи встановлено API_SERVER_URL через config.js
-          if (window.API_SERVER_URL && window.API_SERVER_URL !== null && window.API_SERVER_URL !== 'null') {
-            return window.API_SERVER_URL.endsWith('/api') 
-              ? window.API_SERVER_URL 
-              : `${window.API_SERVER_URL}/api`;
-          }
-          // Якщо не налаштовано для Firebase, показуємо помилку
-          console.error('❌ API сервер не налаштовано для Firebase Hosting!');
-          console.error('📝 Встановіть window.API_SERVER_URL в src/config.js');
-          console.error('💡 Приклад: window.API_SERVER_URL = "https://your-app.railway.app";');
-          // Повертаємо null, щоб показати помилку користувачу
-          return null;
-        }
-        
-        // Інакше використовуємо поточний домен (якщо API на тому ж домені)
-        return `${currentOrigin}/api`;
-      })();
-      
-      // Перевірка доступності API - завжди має бути визначено
-      const isAPIConfigured = API_BASE_URL !== null && API_BASE_URL !== undefined && API_BASE_URL.length > 0;
-      
-      // Логування для діагностики
-      console.log('🔧 API Configuration:', {
-        API_SERVER_URL: API_SERVER_URL,
-        API_BASE_URL: API_BASE_URL,
-        isAPIConfigured: isAPIConfigured,
-        origin: window.location.origin,
-        protocol: window.location.protocol,
-        hostname: window.location.hostname,
-        port: window.location.port
-      });
-      
-      if (!isAPIConfigured) {
-        console.error('❌ API сервер не налаштовано!');
-        console.error('📝 Перевірте налаштування API_BASE_URL');
-        console.error('💡 Поточний API_BASE_URL:', API_BASE_URL);
-        console.error('💡 Для локальної розробки: переконайтеся, що сервер запущений (npm start)');
-        console.error('💡 Для продакшену: встановіть window.API_SERVER_URL в src/config.js');
-      } else {
-        console.log('✅ API сервер налаштовано:', API_BASE_URL);
-      }
-      
-      // Попередження тільки для продакшену (Firebase)
-      if (window.location.origin.includes('web.app') || window.location.origin.includes('firebaseapp.com')) {
-        if (!API_SERVER_URL) {
-          console.warn('⚠️ API сервер не налаштовано для продакшену!');
-          console.warn('📝 Встановіть window.API_SERVER_URL в src/config.js');
-          console.warn('💡 Приклад: window.API_SERVER_URL = "https://your-api-server.railway.app";');
-        }
-      }
-
-      // Load order data from API (global function)
-      window.loadOrderData = async function loadOrderData() {
-        const orderNumberInput = document.getElementById("orderNumberInput");
-        const orderError = document.getElementById("orderError");
-        const orderNumber = orderNumberInput?.value.trim().toUpperCase();
-
-        if (!orderNumber) {
-          orderError.textContent = "Введите номер заказа (например: TG-28451)";
-          orderError.classList.add("show");
-          return;
-        }
-
-        if (!orderNumber.match(/^TG-\d+$/)) {
-          orderError.textContent = "Неверный формат номера. Используйте формат: TG-XXXXX";
-          orderError.classList.add("show");
-          return;
-        }
-
-        // Перевірка налаштування API
-        if (!isAPIConfigured || !API_BASE_URL) {
-          orderError.textContent = `API сервер не настроен. URL: ${API_BASE_URL || 'не определен'}`;
-          orderError.classList.add("show");
-          console.error("API сервер не налаштовано:", {
-            API_BASE_URL,
-            isAPIConfigured,
-            origin: window.location.origin
-          });
-          return;
-        }
-
-        orderError.classList.remove("show");
-
-        // Показати індикатор завантаження
-        const loadBtn = document.querySelector(".order-load-btn");
-        const originalBtnText = loadBtn?.textContent;
-        if (loadBtn) {
-          loadBtn.disabled = true;
-          loadBtn.textContent = "Загрузка...";
-          loadBtn.style.opacity = "0.7";
-        }
-
-        try {
-          // Створюємо AbortController для timeout
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 секунд
-          
-          const response = await fetch(`${API_BASE_URL}/order/${orderNumber}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            signal: controller.signal
-          });
-          
-          clearTimeout(timeoutId);
-          
-          if (!response.ok) {
-            if (response.status === 404) {
-              orderError.textContent = `Заказ ${orderNumber} не найден. Проверьте номер заказа.`;
-              orderError.classList.add("show");
-              if (loadBtn) {
-                loadBtn.disabled = false;
-                loadBtn.textContent = originalBtnText;
-                loadBtn.style.opacity = "1";
-              }
-              return;
-            }
-            throw new Error(`Ошибка сервера: ${response.status}`);
-          }
-
-          const data = await response.json();
-          updateOrderDisplay(data);
-          orderError.classList.remove("show");
-          
-          // Відновити кнопку
-          if (loadBtn) {
-            loadBtn.disabled = false;
-            loadBtn.textContent = originalBtnText;
-            loadBtn.style.opacity = "1";
-          }
-        } catch (error) {
-          console.error("Error loading order:", error);
-          
-          // Більш детальна обробка помилок
-          let errorMessage = "Ошибка подключения к серверу.";
-          
-          if (error.name === 'AbortError') {
-            errorMessage = "Превышено время ожидания ответа сервера. Проверьте подключение к интернету.";
-          } else if (error.message && (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('Network request failed'))) {
-            errorMessage = "Не удалось подключиться к серверу. Проверьте, что API сервер запущен и доступен.";
-          } else if (error.message && error.message.includes('CORS')) {
-            errorMessage = "Ошибка CORS. Убедитесь, что сервер настроен правильно.";
-          } else if (error.message) {
-            errorMessage = error.message;
-          } else {
-            errorMessage = "Ошибка подключения к серверу. Убедитесь, что сервер запущен.";
-          }
-          
-          orderError.textContent = errorMessage;
-          orderError.classList.add("show");
-          
-          // Відновити кнопку
-          if (loadBtn) {
-            loadBtn.disabled = false;
-            loadBtn.textContent = originalBtnText;
-            loadBtn.style.opacity = "1";
-          }
-        }
-      }
-
-      // Оновити тарифи доставки на основі ціни замовлення
-      function updateDeliveryPlans(orderPrice) {
-        // Страхування - 2% від вартості товару
-        const insurance = Math.round(orderPrice * 0.02);
-        
-        // Базові ціни доставки (в рублях)
-        const deliveryBasePrices = {
-          'auto-fast': 5000,      // Авто быстрое - 5000 руб
-          'auto-normal': 3000,   // Авто обычное - 3000 руб (дешевше)
-          'railway': 2000,       // Ж/Д - 2000 руб (найдешевше)
-          'air-express': 30000   // Авиа - 30000 руб (найдорожче)
-        };
-        
-        // Оновити ціни для кожного тарифу
-        const plans = document.querySelectorAll('.plan-card');
-        plans.forEach(plan => {
-          const planType = plan.dataset.plan;
-          const deliveryPrice = deliveryBasePrices[planType] || 0;
-          
-          // Загальна ціна = товар + доставка + страхування
-          const totalPrice = orderPrice + deliveryPrice + insurance;
-          
-          // Зберегти компоненти для відображення
-          plan.dataset.amount = totalPrice;
-          plan.dataset.orderPrice = orderPrice;
-          plan.dataset.deliveryPrice = deliveryPrice;
-          plan.dataset.insurance = insurance;
-          
-          const priceEl = plan.querySelector('.plan-price');
-          if (priceEl) {
-            priceEl.textContent = `${totalPrice.toLocaleString('ru-RU')} ₽`;
-          }
-        });
-        
-        // Оновити вибраний тариф (перший активний)
-        const activePlan = document.querySelector('.plan-card.active');
-        if (activePlan) {
-          const activeAmount = parseInt(activePlan.dataset.amount) || 0;
-          const activeInsurance = parseInt(activePlan.dataset.insurance) || insurance;
-          
-          const summaryPlan = document.getElementById("summaryPlan");
-          const summaryAmount = document.getElementById("summaryAmount");
-          const insuranceRow = document.getElementById("insuranceRow");
-          const insuranceAmount = document.getElementById("insuranceAmount");
-          
-          if (summaryPlan) {
-            summaryPlan.textContent = activePlan.querySelector('.plan-title').textContent;
-          }
-          if (summaryAmount) {
-            summaryAmount.textContent = currencyFormat(activeAmount);
-          }
-          
-          // Показати страхування
-          if (insuranceRow && insuranceAmount && activeInsurance > 0) {
-            insuranceRow.style.display = "flex";
-            insuranceAmount.textContent = currencyFormat(activeInsurance);
-          }
-        }
-      }
-
-      // Update order display with API data
-      function updateOrderDisplay(data) {
-        if (!data.order) return;
-
-        // Update hero card
-        const heroCard = document.querySelector(".hero .order-card");
-        if (heroCard) {
-          const orderNumberEl = heroCard.querySelector("span:first-child");
-          const channelEl = heroCard.querySelector("strong");
-          const productEl = heroCard.querySelector("span:nth-child(3)");
-          const statusBadge = heroCard.querySelector(".badge");
-          if (orderNumberEl) orderNumberEl.textContent = `Заявка № ${data.order.number || "TG-28451"}`;
-          if (channelEl) channelEl.textContent = `Телеграм-канал «${data.order.channelDisplay || data.order.channelName || "ШТОРМ | Товары для СВО"}»`;
-          if (productEl) productEl.textContent = `Товар: ${data.order.productName || "Смарт-часы"} · Доставка: ${data.order.deliveryAddress || "Карго → Москва → СДЭК"}`;
-          if (statusBadge) {
-            const statusText = data.order.status || "Подтверждена";
-            statusBadge.textContent = `Статус заявки: ${statusText}`;
-            // Змінити колір badge в залежності від статусу
-            if (statusText.includes("Ожидает") || statusText.includes("ожидает")) {
-              statusBadge.style.background = "rgba(255, 193, 7, 0.12)";
-              statusBadge.style.color = "#ff9800";
-            } else if (statusText.includes("Оплачен") || statusText.includes("оплачен")) {
-              statusBadge.style.background = "rgba(10, 184, 68, 0.12)";
-              statusBadge.style.color = "#0ab844";
-            }
-          }
-        }
-
-        // Update order overview
-        const orderNumberEl = document.getElementById("orderNumberDisplay");
-        const channelNameEl = document.getElementById("channelNameDisplay");
-        const orderCompositionEl = document.getElementById("orderCompositionDisplay");
-        const recipientNameEl = document.getElementById("recipientNameDisplay");
-        const deliveryAddressEl = document.getElementById("deliveryAddressDisplay");
-        const orderStatus = document.getElementById("orderStatus");
-
-        if (orderNumberEl) orderNumberEl.textContent = `#${data.order.number || "TG-28451"}`;
-        if (channelNameEl) channelNameEl.textContent = data.order.channelName || "@shtorm_svo";
-        if (orderCompositionEl) {
-          // Якщо composition порожнє, використовуємо productName
-          const composition = data.order.composition || data.order.productName || "Смарт-часы · ремешок · гарантия";
-          orderCompositionEl.textContent = composition;
-        }
-        if (recipientNameEl) recipientNameEl.textContent = data.order.recipient || "Андрей Коваленко";
-        if (deliveryAddressEl) {
-          let deliveryText = "Карго: до Москвы · СДЭК до двери";
-          if (data.order.deliveryAddress) {
-            const address = data.order.deliveryAddress;
-            // Перевіряємо, чи адреса вже містить префікс "Карго → Москва → СДЭК"
-            if (address.includes("Карго → Москва → СДЭК")) {
-              deliveryText = address;
-            } else {
-              deliveryText = `Карго → Москва → СДЭК: ${address}`;
-            }
-          }
-          deliveryAddressEl.textContent = deliveryText;
-        }
-        if (orderStatus) orderStatus.textContent = data.order.status || "Ожидает оплаты";
-
-        // Update payment module title
-        const paymentTitle = document.querySelector(".payment-module h3");
-        if (paymentTitle) paymentTitle.textContent = `Оплата заказа ${data.order.number || "TG-28451"}`;
-
-        // Оновити тарифи на основі ціни замовлення
-        const orderPrice = data.order.price || 0;
-        if (orderPrice > 0) {
-          updateDeliveryPlans(orderPrice);
-        }
-
-        // Показати приховані блоки після завантаження замовлення
-        const heroActions = document.getElementById("heroActions");
-        const heroStats = document.getElementById("heroStats");
-        const heroOrderCard = document.getElementById("heroOrderCard");
-        const mainContent = document.getElementById("mainContent");
-
-        if (heroActions) {
-          heroActions.classList.remove("order-content-hidden");
-          heroActions.classList.add("order-content-visible");
-        }
-        if (heroStats) {
-          heroStats.classList.remove("order-content-hidden");
-          heroStats.classList.add("order-content-visible");
-        }
-        if (heroOrderCard) {
-          heroOrderCard.classList.remove("order-content-hidden");
-          heroOrderCard.classList.add("order-content-visible");
-        }
-        if (mainContent) {
-          mainContent.classList.remove("order-content-hidden");
-          mainContent.classList.add("order-content-visible");
-        }
-
-        // Показати footer
-        const footerContent = document.getElementById("footerContent");
-        if (footerContent) {
-          footerContent.classList.remove("order-content-hidden");
-          footerContent.classList.add("order-content-visible");
-        }
-
-        // Плавно прокрутити до контенту
-        setTimeout(() => {
-          if (mainContent) {
-            mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        }, 300);
-      }
-
-      // Load data from admin panel (legacy, for backward compatibility)
-      function loadAdminData() {
-        const data = JSON.parse(localStorage.getItem("adminData") || "{}");
-        
-        if (!data || Object.keys(data).length === 0) {
-          return; // No data, use defaults
-        }
-
-        // Update order data
-        if (data.order) {
-          // Update hero card
-          const heroCard = document.querySelector(".hero .order-card");
-          if (heroCard) {
-            const orderNumberEl = heroCard.querySelector("span:first-child");
-            const channelEl = heroCard.querySelector("strong");
-            const productEl = heroCard.querySelector("span:nth-child(3)");
-            if (orderNumberEl) orderNumberEl.textContent = `Заявка № ${data.order.number || "TG-28451"}`;
-            if (channelEl) channelEl.textContent = `Телеграм-канал «${data.order.channelDisplay || "ШТОРМ | Товары для СВО"}»`;
-            if (productEl) productEl.textContent = `Товар: ${data.order.productName || "Смарт-часы"} · Доставка: Карго → Москва → СДЭК`;
-          }
-
-          // Update order overview
-          const orderNumberEl = document.getElementById("orderNumberDisplay");
-          const channelNameEl = document.getElementById("channelNameDisplay");
-          const orderCompositionEl = document.getElementById("orderCompositionDisplay");
-          const recipientNameEl = document.getElementById("recipientNameDisplay");
-          const deliveryAddressEl = document.getElementById("deliveryAddressDisplay");
-
-          if (orderNumberEl) orderNumberEl.textContent = `#${data.order.number || "TG-28451"}`;
-          if (channelNameEl) channelNameEl.textContent = data.order.channelName || "@shtorm_svo";
-          if (orderCompositionEl) {
-            // Якщо composition порожнє, використовуємо productName
-            const composition = data.order.composition || data.order.productName || "Смарт-часы · ремешок · гарантия";
-            orderCompositionEl.textContent = composition;
-            // Add product description if available
-            if (data.order.productDescription) {
-              const descEl = document.createElement("div");
-              descEl.style.cssText = "font-size: 13px; color: #6b7287; margin-top: 4px;";
-              descEl.textContent = data.order.productDescription;
-              orderCompositionEl.parentElement.appendChild(descEl);
-            }
-          }
-          if (recipientNameEl) recipientNameEl.textContent = data.order.recipient || "Андрей Коваленко";
-          if (deliveryAddressEl) {
-            let deliveryText = "Карго: до Москвы · СДЭК до двери";
-            if (data.order.deliveryAddress) {
-              const address = data.order.deliveryAddress;
-              // Перевіряємо, чи адреса вже містить префікс "Карго → Москва → СДЭК"
-              if (address.includes("Карго → Москва → СДЭК")) {
-                deliveryText = address;
-              } else {
-                deliveryText = `Карго → Москва → СДЭК: ${address}`;
-              }
-            }
-            deliveryAddressEl.textContent = deliveryText;
-          }
-          if (orderStatus) orderStatus.textContent = data.order.status || "Ожидает оплаты";
-
-          // Update payment module title
-          const paymentTitle = document.querySelector(".payment-module h3");
-          if (paymentTitle) paymentTitle.textContent = `Оплата заказа ${data.order.number || "TG-28451"}`;
-        }
-
-        // Update tariffs
-        if (data.tariffs && data.tariffs.length > 0) {
-          const planListEl = document.getElementById("planList");
-          if (planListEl) {
-            planListEl.innerHTML = "";
-            data.tariffs.forEach((tariff, index) => {
-              const planCard = document.createElement("article");
-              planCard.className = `plan-card ${index === 0 ? "active" : ""}`;
-              planCard.dataset.plan = tariff.key || `plan_${index}`;
-              planCard.dataset.amount = tariff.amount || "4900";
-              planCard.innerHTML = `
-                <div class="plan-title">${tariff.name || "Тариф"}</div>
-                <div class="plan-desc">${tariff.desc || "Описание"}</div>
-                <div class="plan-price">${parseInt(tariff.amount || 0).toLocaleString("ru-RU")} ₽</div>
-              `;
-              planListEl.appendChild(planCard);
-            });
-            // Update initial selection
-            if (data.tariffs[0] && summaryPlan && summaryAmount) {
-              summaryPlan.textContent = data.tariffs[0].name;
-              summaryAmount.textContent = currencyFormat(Number(data.tariffs[0].amount));
-            }
-          }
-        }
-
-
-        // Update Telegram bot link
-        if (data.settings?.telegramBot) {
-          const receiptNote = document.getElementById("receiptNote");
-          if (receiptNote) {
-            receiptNote.textContent = `После оплаты загрузите квитанцию в чат Telegram: ${data.settings.telegramBot}.`;
-          }
-        }
-      }
-
-      // DOM elements
-      const planList = document.getElementById("planList");
-      const methodList = document.getElementById("methodList");
-      const summaryPlan = document.getElementById("summaryPlan");
-      const summaryMethod = document.getElementById("summaryMethod");
-      const summaryAmount = document.getElementById("summaryAmount");
-      const payButton = document.getElementById("payButton");
-      const orderStatus = document.getElementById("orderStatus");
-      const receiptNote = document.getElementById("receiptNote");
-      const timelineSteps = document.querySelectorAll(".status-step");
-      const stats = document.querySelectorAll(".stat strong");
-
-      let planLabels = {
-        "auto-fast": "🚗 Авто быстрое",
-        "auto-normal": "🚛 Авто обычное",
-        "railway": "🚆 Ж/Д",
-        "air-express": "✈ Авиа экспресс",
-      };
-
-      const methodLabels = {
-        card: "Банковская карта",
-        sbp: "СБП",
-        govpay: "Госкошелёк",
-      };
-
-      const currencyFormat = (value) =>
-        new Intl.NumberFormat("ru-RU", { style: "currency", currency: "RUB" }).format(value);
-
-      // Animate stats on load
-      window.addEventListener("load", () => {
-        // Переконатися, що всі блоки приховані за замовчуванням
-        const hiddenElements = document.querySelectorAll('.order-content-hidden');
-        hiddenElements.forEach(el => {
-          el.style.display = 'none';
-        });
-
-        // Check URL parameter for order number
-        const urlParams = new URLSearchParams(window.location.search);
-        const orderNumberFromUrl = urlParams.get("order");
-        
-        if (orderNumberFromUrl) {
-          const orderInput = document.getElementById("orderNumberInput");
-          if (orderInput) {
-            orderInput.value = orderNumberFromUrl;
-            loadOrderData();
-          }
-        }
-        // Не завантажуємо admin data автоматично - користувач має ввести номер замовлення
-
-        // Update planLabels from loaded data
-        const data = JSON.parse(localStorage.getItem("adminData") || "{}");
-        if (data.tariffs) {
-          planLabels = {};
-          data.tariffs.forEach((tariff) => {
-            planLabels[tariff.key] = tariff.name;
-          });
-        }
-
-        stats.forEach((stat, index) => {
-          const text = stat.textContent;
-          const number = parseInt(text.replace(/\D/g, ""));
-
-          if (number) {
-            setTimeout(() => {
-              animateCounter(stat, number, 1500);
-            }, index * 200);
-          }
-        });
-
-        // Show progress bar
-        const summary = document.getElementById("summary");
-        const progressContainer = summary?.querySelector(".progress-container");
-        if (progressContainer) {
-          progressContainer.style.display = "block";
-          updateProgress(33);
-        }
-      });
-
-      // Plan selection with animation
-      planList.addEventListener("click", (event) => {
-        const target = event.target.closest(".plan-card");
-        if (!target) return;
-
-        [...planList.children].forEach((child) => child.classList.remove("active"));
-        target.classList.add("active");
-
-        const planKey = target.dataset.plan;
-        const planName = planLabels[planKey] || target.querySelector(".plan-title")?.textContent || "Тариф";
-        const totalAmount = Number(target.dataset.amount) || 0;
-        const insurance = Number(target.dataset.insurance) || 0;
-        
-        summaryPlan.textContent = planName;
-        summaryAmount.textContent = currencyFormat(totalAmount);
-        
-        // Оновити страхування
-        const insuranceRow = document.getElementById("insuranceRow");
-        const insuranceAmount = document.getElementById("insuranceAmount");
-        if (insuranceRow && insuranceAmount) {
-          if (insurance > 0) {
-            insuranceRow.style.display = "flex";
-            insuranceAmount.textContent = currencyFormat(insurance);
-          } else {
-            insuranceRow.style.display = "none";
-          }
-        }
-
-        showToast(`Выбран способ доставки: ${planName}`, "info");
-      });
-
-      // Method selection with animation
-      methodList.addEventListener("click", (event) => {
-        const target = event.target.closest(".method");
-        if (!target) return;
-
-        [...methodList.children].forEach((child) => child.classList.remove("active"));
-        target.classList.add("active");
-
-        summaryMethod.textContent = methodLabels[target.dataset.method];
-        showToast(`Выбран способ: ${methodLabels[target.dataset.method]}`, "info");
-      });
-
-      // Payment process simulation
-      payButton.addEventListener("click", async () => {
-        const activePlan = document.querySelector(".plan-card.active");
-        const activeMethod = document.querySelector(".method.active");
-
-        if (!activePlan || !activeMethod) {
-          showToast("Выберите пакет и способ оплаты", "warning");
-          return;
-        }
-
-        const payload = {
-          plan: activePlan?.dataset.plan,
-          method: activeMethod?.dataset.method,
-          amount: currencyFormat(Number(activePlan?.dataset.amount)),
-        };
-
-        // Disable button and show loading
-        payButton.classList.add("loading");
-        payButton.innerHTML = '<span class="spinner"></span> Обработка...';
-
-        // Simulate payment process
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-
-        updateProgress(66);
-
-        orderStatus.classList.add("updating");
-        orderStatus.textContent = "Оплата отправлена — ждём квитанцию";
-        receiptNote.textContent =
-          "Сохраните чек и отправьте его оператору @gosuslugi_support_bot для проверки.";
-
-        timelineSteps.forEach((step) => step.classList.remove("active"));
-        const step2 = document.querySelector('.status-step[data-step="2"]');
-        step2.classList.add("active");
-
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        orderStatus.classList.remove("updating");
-        payButton.classList.remove("loading");
-        payButton.textContent = "Оплата обработана";
-
-        showToast(
-          `Заявка сформирована! Отправьте квитанцию в Telegram: @gosuslugi_support_bot`,
-          "success"
-        );
-
-        // Reset button after 3 seconds
-        setTimeout(() => {
-          payButton.textContent = "Продолжить к оплате";
-        }, 3000);
-      });
-
-      // Nav interactions
-      document.querySelectorAll("nav span").forEach((item) => {
-        item.addEventListener("click", () => {
-          showToast(`Переход в раздел: ${item.textContent}`, "info");
-        });
-      });
-
-      // Hero buttons
-      document.querySelector(".primary-btn")?.addEventListener("click", () => {
-        showToast("Переход в Telegram...", "info");
-      });
-
-      document.querySelector(".secondary-btn")?.addEventListener("click", () => {
-        showToast("Открыта инструкция", "info");
-      });
-
-      // Tab switching
-      document.querySelectorAll(".tab").forEach((tab) => {
-        tab.addEventListener("click", () => {
-          document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
-          tab.classList.add("active");
-          showToast(`Режим: ${tab.textContent}`, "info");
-        });
-      });
-
-      // Status step click
-      timelineSteps.forEach((step) => {
-        step.addEventListener("click", () => {
-          const stepNum = step.dataset.step;
-          showToast(`Этап ${stepNum}: ${step.querySelector("strong").textContent}`, "info");
-        });
-      });
-
-      // Live time update
-      function updateTime() {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString("ru-RU", {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-        const timeElement = document.getElementById("liveTime");
-        if (timeElement) {
-          timeElement.textContent = timeString;
-        }
-      }
-
-      // Add live time to header if needed
-      const topbar = document.querySelector(".topbar");
-      if (topbar && !document.getElementById("liveTime")) {
-        const timeDiv = document.createElement("div");
-        timeDiv.id = "liveTime";
-        timeDiv.style.cssText = "font-size: 14px; color: #6b7287;";
-        topbar.appendChild(timeDiv);
-        updateTime();
-        setInterval(updateTime, 1000);
-      }
-
-      // Scroll animations
-      const observerOptions = {
-        threshold: 0.1,
-        rootMargin: "0px 0px -50px 0px",
-      };
-
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.style.opacity = "1";
-            entry.target.style.transform = "translateY(0)";
-          }
-        });
-      }, observerOptions);
-
-      document.querySelectorAll(".order-card, .status-step, .plan-card, .method").forEach((el) => {
-        observer.observe(el);
-      });
-
-      // Инициализация Telegram Web App
-      if (window.Telegram?.WebApp) {
-        const tg = window.Telegram.WebApp;
-        
-        // Ініціалізуємо Web App
-        tg.ready();
-        
-        // Розгортаємо на весь екран
-        tg.expand();
-        
-        // Вимкнути конфліктуючі кольори Telegram теми
-        tg.setHeaderColor('#ffffff');
-        tg.setBackgroundColor('#f3f6fb');
-        
-        // Налаштування для правильного відображення
-        // Вимкнути автоматичне застосування кольорів теми
-        if (tg.colorScheme) {
-          // Зберігаємо світлу тему незалежно від налаштувань Telegram
-          document.documentElement.style.setProperty('--tg-theme-bg-color', '#f3f6fb');
-          document.documentElement.style.setProperty('--tg-theme-text-color', '#181f2f');
-          document.documentElement.style.setProperty('--tg-theme-hint-color', '#6b7287');
-          document.documentElement.style.setProperty('--tg-theme-link-color', '#0b63ce');
-          document.documentElement.style.setProperty('--tg-theme-button-color', '#0b63ce');
-          document.documentElement.style.setProperty('--tg-theme-button-text-color', '#ffffff');
-        }
-        
-        // Налаштування кнопки "Назад"
-        if (tg.BackButton) {
-          tg.BackButton.show();
-        tg.BackButton.onClick(() => {
-          tg.close();
-        });
-        }
-        
-        // Виправлення viewport для Telegram WebView
-        const viewport = document.querySelector('meta[name="viewport"]');
-        if (viewport) {
-          viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
-        }
-        
-        // Додаємо клас для стилізації в Telegram
-        document.body.classList.add('telegram-webview');
-        
-        console.log('✅ Telegram Web App initialized');
-      }
 
     </script>
+
+    <div id="max-maskot-container" style="position:relative;min-height:300px">
+      <video id="max-maskot-video"
+       width="256"
+       height="256"
+       muted
+       playsinline
+       autoplay
+       loop
+       preload="auto"
+       style="position:absolute;right:25px;bottom:18px;z-index:10;border-radius:50%">
+  <source src="img/mascot_full.webm" type="video/webm">
+</video>
+
+
+</div>
+
+<script>
+const playlist = [
+  'img/maxae.webm',
+  'img/dymae.webm',
+  'img/stoit.webm',
+  'img/chyhae.webm',
+  'img/zitxnyv.webm'
+];
+
+let current = 0;
+
+const v1 = document.getElementById('v1');
+const v2 = document.getElementById('v2');
+
+v1.style.opacity = 1;
+v2.style.opacity = 0;
+
+// Запускаємо перше
+v1.src = playlist[0];
+v1.play().catch(()=>{});
+
+// Обробники закінчення
+v1.addEventListener('ended', switchVideo);
+v2.addEventListener('ended', switchVideo);
+
+function switchVideo() {
+  current = (current + 1) % playlist.length;
+
+  const top = v1.style.opacity == "1" ? v1 : v2;
+  const bottom = top === v1 ? v2 : v1;
+
+  bottom.src = playlist[current];
+  bottom.load();
+
+  // Чекаємо поки браузер підвантажить перший кадр,
+  // щоб при перемиканні НЕ було білого фрейму
+  bottom.addEventListener('loadeddata', function onReady() {
+    bottom.removeEventListener('loadeddata', onReady);
+
+    bottom.play().catch(()=>{});
+
+    // Перемикаємо після того, як точно є кадр
+    top.style.opacity = 0;
+    bottom.style.opacity = 1;
+  });
+}
+</script>
+
+
 </body>
 </html>
 
