@@ -416,6 +416,7 @@ nav {
 .hero-title-content {
   flex: 1;
   min-width: 300px;
+  order: 1;
 }
 
 .hero-mascot-wrapper {
@@ -424,11 +425,15 @@ nav {
   align-items: center;
   justify-content: center;
   background: transparent;
+  order: 2;
 }
 
 .hero-mascot-wrapper video {
   background: transparent;
   background-color: transparent;
+  -webkit-background-color: transparent;
+  mix-blend-mode: normal;
+  object-fit: contain;
 }
 
 .hero h1 {
@@ -1254,9 +1259,14 @@ footer {
     gap: 24px;
   }
 
+  .hero-mascot-wrapper {
+    order: 1;
+  }
+
   .hero-title-content {
     min-width: auto;
     width: 100%;
+    order: 2;
   }
 
   .hero-mascot-wrapper video {
@@ -1353,6 +1363,17 @@ body.telegram-webview .main-header {
 
 body.telegram-webview .header {
   background: rgba(255, 255, 255, 0.95);
+}
+
+body.telegram-webview .hero-mascot-wrapper {
+  background: transparent;
+}
+
+body.telegram-webview .hero-mascot-wrapper video {
+  background: transparent !important;
+  background-color: transparent !important;
+  -webkit-background-color: transparent !important;
+  mix-blend-mode: normal;
 }
 
 /* Блок введення номера заказа */

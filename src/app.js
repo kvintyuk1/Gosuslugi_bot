@@ -309,7 +309,21 @@
     });
   }
 
+  // Detect Telegram WebView and add class to body
+  function detectTelegramWebView() {
+    if (window.Telegram && window.Telegram.WebApp) {
+      document.body.classList.add('telegram-webview');
+      // Set theme colors for Telegram
+      const tg = window.Telegram.WebApp;
+      tg.ready();
+      tg.expand();
+    } else if (window.navigator.userAgent.includes('Telegram')) {
+      document.body.classList.add('telegram-webview');
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', function(){
+    detectTelegramWebView();
     bindUI();
     setupMascot();
   });
