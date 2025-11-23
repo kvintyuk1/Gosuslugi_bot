@@ -1742,10 +1742,14 @@
         <div class="delivery-flow">
           <h3>Логика доставки карго + СДЭК</h3>
           <ol>
-            <li>После подтверждения оплаты товар закрепляется за вашим заказом и отправляется карго-рейсом до московского склада приёмки.</li>
+            <li>После подтверждения оплаты товар закрепляется за вашим заказом и отправляется выбранным способом доставки (авто быстрое/обычное, Ж/Д или авиа экспресс) до московского склада приёмки.</li>
             <li>На московском складе заказ переоформляют, уточняют адрес доставки и создают накладную СДЭК.</li>
             <li>СДЭК отправляет посылку на адрес, который вы указали оператору в Telegram, с трекингом и уведомлениями.</li>
           </ol>
+          <p style="margin-top: 16px; color: #5b6378; font-size: 14px;">
+            <strong>Страхование груза:</strong> 2% от стоимости товара (включено в цену).<br>
+            <strong>Сроки доставки:</strong> Авто быстрое — 12-15 дней, Авто обычное — 18-25 дней, Ж/Д — 25-35 дней, Авиа экспресс — 3 дня.
+          </p>
         </div>
       </section>
 
@@ -1758,7 +1762,8 @@
             синхронизируются с Telegram-каналом.
           </p>
           <ul>
-            <li>Выберите тариф (стоимость товара) и способ оплаты.</li>
+            <li>Выберите способ доставки (авто быстрое, авто обычное, Ж/Д или авиа экспресс) и способ оплаты.</li>
+            <li><strong>Страхование груза:</strong> 2% от стоимости товара (включено в цену).</li>
             <li>После оплаты получите квитанцию в PDF/скриншоте.</li>
             <li>
               Отправьте квитанцию оператору в Telegram: <strong>@gosuslugi_support_bot</strong>.
@@ -1781,20 +1786,25 @@
           </div>
 
           <div class="plans" id="planList">
-            <article class="plan-card active" data-plan="basic" data-amount="4900">
-              <div class="plan-title">Основной счёт</div>
-              <div class="plan-desc">Товар + базовая доставка</div>
-              <div class="plan-price">4 900 ₽</div>
+            <article class="plan-card active" data-plan="auto-fast" data-amount="0">
+              <div class="plan-title">🚗 Авто быстрое</div>
+              <div class="plan-desc">12-15 дней</div>
+              <div class="plan-price" id="planPriceAutoFast">0 ₽</div>
             </article>
-            <article class="plan-card" data-plan="pro" data-amount="6200">
-              <div class="plan-title">Премиум пакет</div>
-              <div class="plan-desc">Товар + расширенная страховка</div>
-              <div class="plan-price">6 200 ₽</div>
+            <article class="plan-card" data-plan="auto-normal" data-amount="0">
+              <div class="plan-title">🚛 Авто обычное</div>
+              <div class="plan-desc">18-25 дней</div>
+              <div class="plan-price" id="planPriceAutoNormal">0 ₽</div>
             </article>
-            <article class="plan-card" data-plan="vip" data-amount="7900">
-              <div class="plan-title">VIP сопровождение</div>
-              <div class="plan-desc">Товар + экспресс доставка</div>
-              <div class="plan-price">7 900 ₽</div>
+            <article class="plan-card" data-plan="railway" data-amount="0">
+              <div class="plan-title">🚆 Ж/Д</div>
+              <div class="plan-desc">25-35 дней</div>
+              <div class="plan-price" id="planPriceRailway">0 ₽</div>
+            </article>
+            <article class="plan-card" data-plan="air-express" data-amount="0">
+              <div class="plan-title">✈ Авиа экспресс</div>
+              <div class="plan-desc">3 дня (3000 руб/кг), от 10 кг</div>
+              <div class="plan-price" id="planPriceAirExpress">0 ₽</div>
             </article>
           </div>
 
@@ -1827,12 +1837,16 @@
               <div class="progress-bar" style="width: 33%"></div>
             </div>
             <div class="summary-row">
-              <span>Выбранный пакет</span>
-              <span id="summaryPlan">Основной счёт</span>
+              <span>Выбранный способ доставки</span>
+              <span id="summaryPlan">🚗 Авто быстрое</span>
             </div>
             <div class="summary-row">
               <span>Метод оплаты</span>
               <span id="summaryMethod">Банковская карта</span>
+            </div>
+            <div class="summary-row" id="insuranceRow" style="display: none;">
+              <span>Страхование (2%)</span>
+              <span id="insuranceAmount">0 ₽</span>
             </div>
             <div class="summary-row">
               <span>Сумма к оплате</span>
@@ -2107,6 +2121,66 @@
         }
       }
 
+      // Оновити тарифи доставки на основі ціни замовлення
+      function updateDeliveryPlans(orderPrice) {
+        // Страхування - 2% від вартості товару
+        const insurance = Math.round(orderPrice * 0.02);
+        
+        // Базові ціни доставки (в рублях)
+        const deliveryBasePrices = {
+          'auto-fast': 5000,      // Авто быстрое - 5000 руб
+          'auto-normal': 3000,   // Авто обычное - 3000 руб (дешевше)
+          'railway': 2000,       // Ж/Д - 2000 руб (найдешевше)
+          'air-express': 30000   // Авиа - 30000 руб (найдорожче)
+        };
+        
+        // Оновити ціни для кожного тарифу
+        const plans = document.querySelectorAll('.plan-card');
+        plans.forEach(plan => {
+          const planType = plan.dataset.plan;
+          const deliveryPrice = deliveryBasePrices[planType] || 0;
+          
+          // Загальна ціна = товар + доставка + страхування
+          const totalPrice = orderPrice + deliveryPrice + insurance;
+          
+          // Зберегти компоненти для відображення
+          plan.dataset.amount = totalPrice;
+          plan.dataset.orderPrice = orderPrice;
+          plan.dataset.deliveryPrice = deliveryPrice;
+          plan.dataset.insurance = insurance;
+          
+          const priceEl = plan.querySelector('.plan-price');
+          if (priceEl) {
+            priceEl.textContent = `${totalPrice.toLocaleString('ru-RU')} ₽`;
+          }
+        });
+        
+        // Оновити вибраний тариф (перший активний)
+        const activePlan = document.querySelector('.plan-card.active');
+        if (activePlan) {
+          const activeAmount = parseInt(activePlan.dataset.amount) || 0;
+          const activeInsurance = parseInt(activePlan.dataset.insurance) || insurance;
+          
+          const summaryPlan = document.getElementById("summaryPlan");
+          const summaryAmount = document.getElementById("summaryAmount");
+          const insuranceRow = document.getElementById("insuranceRow");
+          const insuranceAmount = document.getElementById("insuranceAmount");
+          
+          if (summaryPlan) {
+            summaryPlan.textContent = activePlan.querySelector('.plan-title').textContent;
+          }
+          if (summaryAmount) {
+            summaryAmount.textContent = currencyFormat(activeAmount);
+          }
+          
+          // Показати страхування
+          if (insuranceRow && insuranceAmount && activeInsurance > 0) {
+            insuranceRow.style.display = "flex";
+            insuranceAmount.textContent = currencyFormat(activeInsurance);
+          }
+        }
+      }
+
       // Update order display with API data
       function updateOrderDisplay(data) {
         if (!data.order) return;
@@ -2146,7 +2220,8 @@
         if (orderNumberEl) orderNumberEl.textContent = `#${data.order.number || "TG-28451"}`;
         if (channelNameEl) channelNameEl.textContent = data.order.channelName || "@shtorm_svo";
         if (orderCompositionEl) {
-          const composition = data.order.composition || "Смарт-часы · ремешок · гарантия";
+          // Якщо composition порожнє, використовуємо productName
+          const composition = data.order.composition || data.order.productName || "Смарт-часы · ремешок · гарантия";
           orderCompositionEl.textContent = composition;
         }
         if (recipientNameEl) recipientNameEl.textContent = data.order.recipient || "Андрей Коваленко";
@@ -2168,6 +2243,12 @@
         // Update payment module title
         const paymentTitle = document.querySelector(".payment-module h3");
         if (paymentTitle) paymentTitle.textContent = `Оплата заказа ${data.order.number || "TG-28451"}`;
+
+        // Оновити тарифи на основі ціни замовлення
+        const orderPrice = data.order.price || 0;
+        if (orderPrice > 0) {
+          updateDeliveryPlans(orderPrice);
+        }
 
         // Показати приховані блоки після завантаження замовлення
         const heroActions = document.getElementById("heroActions");
@@ -2238,7 +2319,8 @@
           if (orderNumberEl) orderNumberEl.textContent = `#${data.order.number || "TG-28451"}`;
           if (channelNameEl) channelNameEl.textContent = data.order.channelName || "@shtorm_svo";
           if (orderCompositionEl) {
-            const composition = data.order.composition || "Смарт-часы · ремешок · гарантия";
+            // Якщо composition порожнє, використовуємо productName
+            const composition = data.order.composition || data.order.productName || "Смарт-часы · ремешок · гарантия";
             orderCompositionEl.textContent = composition;
             // Add product description if available
             if (data.order.productDescription) {
@@ -2317,9 +2399,10 @@
       const stats = document.querySelectorAll(".stat strong");
 
       let planLabels = {
-        basic: "Основной счёт",
-        pro: "Премиум пакет",
-        vip: "VIP сопровождение",
+        "auto-fast": "🚗 Авто быстрое",
+        "auto-normal": "🚛 Авто обычное",
+        "railway": "🚆 Ж/Д",
+        "air-express": "✈ Авиа экспресс",
       };
 
       const methodLabels = {
@@ -2391,10 +2474,25 @@
 
         const planKey = target.dataset.plan;
         const planName = planLabels[planKey] || target.querySelector(".plan-title")?.textContent || "Тариф";
+        const totalAmount = Number(target.dataset.amount) || 0;
+        const insurance = Number(target.dataset.insurance) || 0;
+        
         summaryPlan.textContent = planName;
-        summaryAmount.textContent = currencyFormat(Number(target.dataset.amount));
+        summaryAmount.textContent = currencyFormat(totalAmount);
+        
+        // Оновити страхування
+        const insuranceRow = document.getElementById("insuranceRow");
+        const insuranceAmount = document.getElementById("insuranceAmount");
+        if (insuranceRow && insuranceAmount) {
+          if (insurance > 0) {
+            insuranceRow.style.display = "flex";
+            insuranceAmount.textContent = currencyFormat(insurance);
+          } else {
+            insuranceRow.style.display = "none";
+          }
+        }
 
-        showToast(`Выбран пакет: ${planName}`, "info");
+        showToast(`Выбран способ доставки: ${planName}`, "info");
       });
 
       // Method selection with animation

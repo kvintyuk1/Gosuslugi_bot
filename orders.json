@@ -66,18 +66,5 @@
     "status": "Ожидает оплаты",
     "createdAt": "2025-11-23T11:15:58.070Z",
     "updatedAt": "2025-11-23T11:15:58.070Z"
-  },
-  {
-    "orderNumber": "TG-28458",
-    "recipientName": "fgdfgdfgfgfdg",
-    "channelName": "sfdsfsfdsfsd",
-    "productName": "dsfdfsdfdfsd",
-    "composition": "",
-    "deliveryAddress": "dfdsfsdfdsfd",
-    "price": 47000,
-    "sellerName": "vcsdsd dsfdsf dfs",
-    "status": "dfsdfsd",
-    "createdAt": "2025-11-23T11:49:54.094Z",
-    "updatedAt": "2025-11-23T11:49:54.094Z"
   }
 ]

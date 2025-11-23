@@ -146,31 +146,6 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📦 Using simple JSON database (orders.json)`);
-  
-  // Запустити Telegram бота після запуску сервера
-  if (process.env.ENABLE_BOT !== "false") {
-    try {
-      const token = process.env.BOT_TOKEN;
-      if (token && token !== "YOUR_BOT_TOKEN" && token.length > 10) {
-        console.log("📱 Запуск Telegram бота...");
-        // Завантажити бота асинхронно, щоб не блокувати сервер
-        setImmediate(() => {
-          try {
-            require("./bot");
-            console.log("✅ Telegram bot initialized");
-          } catch (botError) {
-            console.error("⚠️ Помилка запуску бота:", botError.message);
-            console.log("💡 Бот може бути запущений окремо або BOT_TOKEN не встановлено правильно");
-          }
-        });
-      } else {
-        console.log("⚠️ BOT_TOKEN не встановлено або невалідний, бот не запущено");
-        console.log("💡 Встановіть змінну середовища BOT_TOKEN в Railway для запуску бота");
-      }
-    } catch (error) {
-      console.error("⚠️ Помилка ініціалізації бота:", error.message);
-    }
-  }
 }).on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
     console.error(`❌ Port ${PORT} is already in use.`);
