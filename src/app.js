@@ -69,7 +69,11 @@
         return;
       }
 
+      // Save order data globally for use in other functions
+      window.currentOrder = order;
+
       // Update UI with real order data
+      const orderNumber = order.number || val;
       const orderNumberDisplay = document.getElementById('orderNumberDisplay');
       const channelNameDisplay = document.getElementById('channelNameDisplay');
       const orderCompositionDisplay = document.getElementById('orderCompositionDisplay');
@@ -77,15 +81,27 @@
       const deliveryAddressDisplay = document.getElementById('deliveryAddressDisplay');
       const orderStatus = document.getElementById('orderStatus');
 
-      if (orderNumberDisplay) orderNumberDisplay.textContent = order.number || val;
+      if (orderNumberDisplay) orderNumberDisplay.textContent = orderNumber;
       if (channelNameDisplay) channelNameDisplay.textContent = order.channelName || order.channelDisplay || 'Не указано';
       if (orderCompositionDisplay) {
-        const composition = order.composition && order.composition.trim() ? order.composition : 'Не указано';
+        // Если composition пустое, используем productName
+        const composition = order.composition && order.composition.trim() 
+          ? order.composition 
+          : (order.productName || 'Не указано');
         orderCompositionDisplay.textContent = composition;
       }
       if (recipientNameDisplay) recipientNameDisplay.textContent = order.recipient || 'Не указано';
       if (deliveryAddressDisplay) deliveryAddressDisplay.textContent = order.deliveryAddress || 'Не указано';
       if (orderStatus) orderStatus.textContent = order.status || 'Ожидает оплаты';
+
+      // Update payment section header with order number
+      const paymentHeader = document.querySelector('.payment-module .module-header h3');
+      if (paymentHeader) {
+        paymentHeader.textContent = `Оплата заказа ${orderNumber}`;
+      }
+
+      // Calculate and update delivery prices
+      updateDeliveryPrices(order.price || 0);
 
       // Show order content
       document.querySelectorAll('.order-content-hidden').forEach(el=> el.classList.remove('order-content-hidden'));
@@ -101,6 +117,56 @@
         orderError.classList.add('show');
       }
       showToast('Ошибка загрузки данных заказа', 'error');
+    }
+  }
+
+  // Calculate delivery prices based on product price
+  function updateDeliveryPrices(productPrice) {
+    if (!productPrice || productPrice <= 0) {
+      // If no price, show 0
+      document.querySelectorAll('.plan-price').forEach(el => {
+        if (el) el.textContent = '0 ₽';
+      });
+      return;
+    }
+
+    // Delivery prices calculation:
+    // - Авто быстрое: 15% от стоимости товара + 2% страхование
+    // - Авто обычное: 12% от стоимости товара + 2% страхование
+    // - Ж/Д: 10% от стоимости товара + 2% страхование
+    // - Авиа экспресс: 3000 руб/кг (минимум 10 кг = 30000 руб) + 2% страхование
+    
+    const insurance = Math.round(productPrice * 0.02); // 2% страхование
+    
+    const autoFastPrice = Math.round(productPrice * 0.15) + insurance;
+    const autoNormalPrice = Math.round(productPrice * 0.12) + insurance;
+    const railwayPrice = Math.round(productPrice * 0.10) + insurance;
+    const airExpressPrice = 30000 + insurance; // Минимум 10 кг по 3000 руб/кг
+
+    const autoFastEl = document.getElementById('planPriceAutoFast');
+    const autoNormalEl = document.getElementById('planPriceAutoNormal');
+    const railwayEl = document.getElementById('planPriceRailway');
+    const airExpressEl = document.getElementById('planPriceAirExpress');
+
+    if (autoFastEl) {
+      autoFastEl.textContent = `${autoFastPrice.toLocaleString('ru-RU')} ₽`;
+      const card = autoFastEl.closest('.plan-card');
+      if (card) card.setAttribute('data-amount', autoFastPrice);
+    }
+    if (autoNormalEl) {
+      autoNormalEl.textContent = `${autoNormalPrice.toLocaleString('ru-RU')} ₽`;
+      const card = autoNormalEl.closest('.plan-card');
+      if (card) card.setAttribute('data-amount', autoNormalPrice);
+    }
+    if (railwayEl) {
+      railwayEl.textContent = `${railwayPrice.toLocaleString('ru-RU')} ₽`;
+      const card = railwayEl.closest('.plan-card');
+      if (card) card.setAttribute('data-amount', railwayPrice);
+    }
+    if (airExpressEl) {
+      airExpressEl.textContent = `${airExpressPrice.toLocaleString('ru-RU')} ₽`;
+      const card = airExpressEl.closest('.plan-card');
+      if (card) card.setAttribute('data-amount', airExpressPrice);
     }
   }
 
