@@ -405,6 +405,26 @@ nav {
   }
 }
 
+.hero-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin: 16px 0 24px;
+  flex-wrap: wrap;
+}
+
+.hero-title-content {
+  flex: 1;
+  min-width: 300px;
+}
+
+.hero-mascot-wrapper {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .hero h1 {
   margin: 0 0 16px;
   font-size: clamp(32px, 4vw, 48px);
@@ -1219,6 +1239,23 @@ footer {
   .hero-inner {
     grid-template-columns: 1fr;
     gap: 32px;
+  }
+
+  .hero-title-wrapper {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 24px;
+  }
+
+  .hero-title-content {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .hero-mascot-wrapper video {
+    width: 160px;
+    height: 160px;
   }
 
   .hero-features {

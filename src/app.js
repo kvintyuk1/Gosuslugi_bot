@@ -94,6 +94,22 @@
       if (deliveryAddressDisplay) deliveryAddressDisplay.textContent = order.deliveryAddress || 'Не указано';
       if (orderStatus) orderStatus.textContent = order.status || 'Ожидает оплаты';
 
+      // Update hero card elements (sticky card at top)
+      const heroOrderNumber = document.getElementById('heroOrderNumber');
+      const heroChannelName = document.getElementById('heroChannelName');
+      const heroProductDelivery = document.getElementById('heroProductDelivery');
+      
+      if (heroOrderNumber) heroOrderNumber.textContent = orderNumber;
+      if (heroChannelName) {
+        const channelName = order.channelName || order.channelDisplay || 'Не указано';
+        heroChannelName.textContent = `Телеграм-канал «${channelName}»`;
+      }
+      if (heroProductDelivery) {
+        const productName = order.productName || 'Не указано';
+        const deliveryAddress = order.deliveryAddress || 'Не указано';
+        heroProductDelivery.textContent = `Товар: ${productName} · Доставка: ${deliveryAddress}`;
+      }
+
       // Update payment section header with order number
       const paymentHeader = document.querySelector('.payment-module .module-header h3');
       if (paymentHeader) {
@@ -102,6 +118,9 @@
 
       // Calculate and update delivery prices
       updateDeliveryPrices(order.price || 0);
+      
+      // Update summary amount with default selected plan (auto-fast)
+      updateSummary();
 
       // Show order content
       document.querySelectorAll('.order-content-hidden').forEach(el=> el.classList.remove('order-content-hidden'));
@@ -167,6 +186,26 @@
       airExpressEl.textContent = `${airExpressPrice.toLocaleString('ru-RU')} ₽`;
       const card = airExpressEl.closest('.plan-card');
       if (card) card.setAttribute('data-amount', airExpressPrice);
+    }
+    
+    // Update summary after prices are calculated
+    updateSummary();
+  }
+  
+  // Helper function to update summary (exposed for use in updateDeliveryPrices)
+  function updateSummary() {
+    const activePlan = document.querySelector('.plan-card.active');
+    if (!activePlan) return;
+    
+    const planName = activePlan.querySelector('.plan-title')?.textContent || '';
+    const planAmount = parseInt(activePlan.getAttribute('data-amount') || '0', 10);
+    
+    const summaryPlan = document.getElementById('summaryPlan');
+    const summaryAmount = document.getElementById('summaryAmount');
+    
+    if (summaryPlan) summaryPlan.textContent = planName;
+    if (summaryAmount) {
+      summaryAmount.textContent = `${planAmount.toLocaleString('ru-RU')} ₽`;
     }
   }
 
@@ -241,6 +280,32 @@
         item.dataset.toast = item.textContent.trim();
         item.dataset.toastType = 'info';
       }
+    });
+
+    // Handle delivery plan selection
+    document.querySelectorAll('.plan-card').forEach(card => {
+      card.addEventListener('click', function() {
+        // Remove active class from all cards
+        document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('active'));
+        // Add active class to clicked card
+        this.classList.add('active');
+        // Update summary
+        updateSummary();
+      });
+    });
+
+    // Handle payment method selection
+    document.querySelectorAll('.method').forEach(method => {
+      method.addEventListener('click', function() {
+        // Remove active class from all methods
+        document.querySelectorAll('.method').forEach(m => m.classList.remove('active'));
+        // Add active class to clicked method
+        this.classList.add('active');
+        // Update summary method
+        const methodName = this.querySelector('.plan-title')?.textContent || '';
+        const summaryMethod = document.getElementById('summaryMethod');
+        if (summaryMethod) summaryMethod.textContent = methodName;
+      });
     });
   }
 

@@ -57,7 +57,24 @@
         <div class="hero-content">
         <div>
           <div class="badge">Онлайн-оплата через Госуслуги</div>
-          <h1>Официальная оплата товара из Telegram-канала.</h1>
+          <div class="hero-title-wrapper">
+            <div class="hero-title-content">
+              <h1>Официальная оплата товара из Telegram-канала.</h1>
+            </div>
+            <div class="hero-mascot-wrapper">
+              <video 
+                id="hero-mascot-video"
+                width="200"
+                height="200"
+                muted
+                playsinline
+                autoplay
+                loop
+                preload="auto"
+                <source src="img/mascot_full.webm" type="video/webm">
+              </video>
+            </div>
+          </div>
           <p class="order-description">
             Мы оформили заявку в стиле Госуслуг: заказ из Telegram-канала переносится в
             защищённый кабинет, где оплата фиксируется, статус обновляется, а квитанция
@@ -173,9 +190,9 @@
         </div>
         <div>
           <div class="order-card order-content-hidden" id="heroOrderCard" style="box-shadow: 0 20px 40px rgba(12, 44, 78, 0.15); position: sticky; top: 80px;">
-          <span>Заявка № TG-28451</span>
-          <strong>Телеграм-канал «ШТОРМ | Товары для СВО»</strong>
-          <span>Товар: Смарт-часы · Доставка: Карго → Москва → СДЭК</span>
+          <span>Заявка № <span id="heroOrderNumber">TG-28451</span></span>
+          <strong id="heroChannelName">Телеграм-канал «ШТОРМ | Товары для СВО»</strong>
+          <span id="heroProductDelivery">Товар: Смарт-часы · Доставка: Карго → Москва → СДЭК</span>
           <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
             <div class="badge" style="background: rgba(10, 184, 68, 0.12); color: #0ab844">
               Статус заявки: Подтверждена
@@ -396,21 +413,6 @@
     </div>
 
 
-    <div id="max-maskot-container" style="position:relative;min-height:300px">
-      <video id="max-maskot-video"
-       width="256"
-       height="256"
-       muted
-       playsinline
-       autoplay
-       loop
-       preload="auto"
-       style="position:absolute;right:25px;bottom:18px;z-index:10;border-radius:50%">
-  <source src="img/mascot_full.webm" type="video/webm">
-</video>
-
-
-</div>
 
     <script src="/app.js" defer></script>
 
