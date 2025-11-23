@@ -4,7 +4,22 @@
 const fs = require("fs");
 const path = require("path");
 
-const DB_FILE = path.join(__dirname, "orders.json");
+// Використовувати Railway Volume або локальний файл
+// Railway Volume монтується в /data, якщо він налаштований
+// Перевіряємо, чи існує /data (Railway Volume), інакше використовуємо поточну директорію
+let DATA_DIR = __dirname;
+if (fs.existsSync("/data")) {
+  DATA_DIR = "/data";
+  console.log("📦 Використовується Railway Volume: /data");
+} else if (process.env.DATA_DIR) {
+  DATA_DIR = process.env.DATA_DIR;
+  console.log(`📦 Використовується DATA_DIR з env: ${DATA_DIR}`);
+} else {
+  console.log(`📦 Використовується локальна директорія: ${DATA_DIR}`);
+}
+
+const DB_FILE = path.join(DATA_DIR, "orders.json");
+console.log(`📂 Шлях до файлу БД: ${DB_FILE}`);
 
 // In-memory база даних
 let orders = [];
@@ -56,7 +71,7 @@ function loadDatabase(silent = false) {
       orders = [];
       saveDatabase(); // Створити порожній файл
       if (!silent) {
-        console.log("✅ Створено нову базу даних");
+      console.log("✅ Створено нову базу даних");
       }
     }
   } catch (error) {
@@ -70,11 +85,20 @@ function loadDatabase(silent = false) {
 // Зберегти дані в файл
 function saveDatabase() {
   try {
+    // Створити директорію, якщо її немає
+    const dir = path.dirname(DB_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+      console.log(`📁 Створено директорію: ${dir}`);
+    }
+    
     fs.writeFileSync(DB_FILE, JSON.stringify(orders, null, 2), "utf8");
     // Оновити час модифікації після збереження
     lastModifiedTime = getFileModificationTime();
+    console.log(`💾 Збережено ${orders.length} замовлень у файл: ${DB_FILE}`);
   } catch (error) {
     console.error("❌ Помилка збереження бази даних:", error);
+    console.error("❌ Деталі помилки:", error.message);
   }
 }
 

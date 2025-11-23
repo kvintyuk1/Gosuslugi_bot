@@ -55,7 +55,7 @@ app.get("/api/order/:orderNumber", (req, res) => {
     }
     
     const order = db.findOrder(orderNumber);
-    
+
     if (!order) {
       console.log(`❌ Замовлення ${orderNumber} не знайдено після пошуку`);
       return res.status(404).json({ 
