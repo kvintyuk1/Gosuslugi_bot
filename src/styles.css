@@ -1014,16 +1014,7 @@
       }
 
       /* Interactive timeline connector */
-      .status-timeline::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: #e8edf5;
-        z-index: 0;
-      }
+      
 
       .status-step {
         position: relative;
