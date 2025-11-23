@@ -17,8 +17,8 @@
     window._toastHide = setTimeout(()=> toast.classList.remove('show'), timeout);
   }
 
-  // Simple order loader (mock). Replace fetch with real API as needed.
-  function loadOrderData(){
+  // Order loader - fetches real data from API
+  async function loadOrderData(){
     const input = document.getElementById('orderNumberInput');
     const orderError = document.getElementById('orderError');
     if (!input) return;
@@ -35,26 +35,73 @@
       return;
     }
 
-    const orderNumberDisplay = document.getElementById('orderNumberDisplay');
-    const channelNameDisplay = document.getElementById('channelNameDisplay');
-    const orderCompositionDisplay = document.getElementById('orderCompositionDisplay');
-    const recipientNameDisplay = document.getElementById('recipientNameDisplay');
-    const deliveryAddressDisplay = document.getElementById('deliveryAddressDisplay');
-    const orderStatus = document.getElementById('orderStatus');
+    // Show loading state
+    showToast('Загрузка данных заказа...', 'info', 2000);
 
-    if (orderNumberDisplay) orderNumberDisplay.textContent = val;
-    if (channelNameDisplay) channelNameDisplay.textContent = '@shtorm_svo';
-    if (orderCompositionDisplay) orderCompositionDisplay.textContent = 'Смарт-часы · ремешок · гарантия';
-    if (recipientNameDisplay) recipientNameDisplay.textContent = 'Андрей Коваленко';
-    if (deliveryAddressDisplay) deliveryAddressDisplay.textContent = 'Карго: до Москвы · СДЭК до двери';
-    if (orderStatus) orderStatus.textContent = 'Ожидает оплаты';
+    try {
+      // Determine API URL - use config if available, otherwise use relative path
+      const apiBaseUrl = window.API_SERVER_URL || '';
+      const apiUrl = `${apiBaseUrl}/api/order/${val}`;
+      
+      const response = await fetch(apiUrl);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          if (orderError) {
+            orderError.textContent = `Заказ ${val} не найден. Проверьте номер заказа.`;
+            orderError.classList.add('show');
+          }
+          showToast('Заказ не найден', 'error');
+          return;
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-    document.querySelectorAll('.order-content-hidden').forEach(el=> el.classList.remove('order-content-hidden'));
-    document.querySelectorAll('.order-content-visible').forEach(el=> el.classList.add('order-content-visible'));
-    const main = document.getElementById('mainContent'); if (main) main.style.display = '';
-    const footer = document.getElementById('footerContent'); if (footer) footer.classList.remove('order-content-hidden');
+      const data = await response.json();
+      const order = data.order;
 
-    showToast('Данные заказа загружены', 'success');
+      if (!order) {
+        if (orderError) {
+          orderError.textContent = 'Ошибка: данные заказа не получены';
+          orderError.classList.add('show');
+        }
+        showToast('Ошибка загрузки данных', 'error');
+        return;
+      }
+
+      // Update UI with real order data
+      const orderNumberDisplay = document.getElementById('orderNumberDisplay');
+      const channelNameDisplay = document.getElementById('channelNameDisplay');
+      const orderCompositionDisplay = document.getElementById('orderCompositionDisplay');
+      const recipientNameDisplay = document.getElementById('recipientNameDisplay');
+      const deliveryAddressDisplay = document.getElementById('deliveryAddressDisplay');
+      const orderStatus = document.getElementById('orderStatus');
+
+      if (orderNumberDisplay) orderNumberDisplay.textContent = order.number || val;
+      if (channelNameDisplay) channelNameDisplay.textContent = order.channelName || order.channelDisplay || 'Не указано';
+      if (orderCompositionDisplay) {
+        const composition = order.composition && order.composition.trim() ? order.composition : 'Не указано';
+        orderCompositionDisplay.textContent = composition;
+      }
+      if (recipientNameDisplay) recipientNameDisplay.textContent = order.recipient || 'Не указано';
+      if (deliveryAddressDisplay) deliveryAddressDisplay.textContent = order.deliveryAddress || 'Не указано';
+      if (orderStatus) orderStatus.textContent = order.status || 'Ожидает оплаты';
+
+      // Show order content
+      document.querySelectorAll('.order-content-hidden').forEach(el=> el.classList.remove('order-content-hidden'));
+      document.querySelectorAll('.order-content-visible').forEach(el=> el.classList.add('order-content-visible'));
+      const main = document.getElementById('mainContent'); if (main) main.style.display = '';
+      const footer = document.getElementById('footerContent'); if (footer) footer.classList.remove('order-content-hidden');
+
+      showToast('Данные заказа загружены', 'success');
+    } catch (error) {
+      console.error('Error loading order:', error);
+      if (orderError) {
+        orderError.textContent = `Ошибка загрузки: ${error.message}`;
+        orderError.classList.add('show');
+      }
+      showToast('Ошибка загрузки данных заказа', 'error');
+    }
   }
 
   // Mascot playlist player
