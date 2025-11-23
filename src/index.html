@@ -41,46 +41,190 @@
         padding-right: env(safe-area-inset-right);
       }
 
-      header {
-        background: #ffffff;
-        border-bottom: 1px solid #e2e8f0;
-        padding: 0 32px;
+      .main-header {
         position: sticky;
         top: 0;
         z-index: 100;
+        background: #ffffff;
+      }
+
+      .main-header {
+        width: 100%;
+      }
+
+      .header {
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .header .inner {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 72px;
         /* Safe area для Telegram WebView */
         padding-top: max(0px, env(safe-area-inset-top));
         padding-left: max(32px, calc(32px + env(safe-area-inset-left)));
         padding-right: max(32px, calc(32px + env(safe-area-inset-right)));
       }
 
-      .topbar {
+      .container-d {
         max-width: 1280px;
         margin: 0 auto;
+      }
+
+      .flex-container {
+        display: flex;
+      }
+
+      .justify-between {
+        justify-content: space-between;
+      }
+
+      .justify-end {
+        justify-content: flex-end;
+      }
+
+      .align-items-center {
+        align-items: center;
+      }
+
+      .mr-16 {
+        margin-right: 16px;
+      }
+
+      .ml-32 {
+        margin-left: 32px;
+      }
+
+      .overflow-container {
+        overflow: hidden;
+      }
+
+      .header-left {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        height: 72px;
+        gap: 0;
+      }
+
+      .burger {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        transition: background-color 0.2s;
+        position: relative;
+      }
+
+      .burger:hover {
+        background-color: #f3f6fb;
+      }
+
+      .burger i.burger-icon {
+        width: 24px;
+        height: 24px;
+        display: block;
+        background-color: #181f2f;
+        mask-size: contain;
+        -webkit-mask-size: contain;
+        mask-repeat: no-repeat;
+        -webkit-mask-repeat: no-repeat;
+        mask-position: center;
+        -webkit-mask-position: center;
+      }
+
+      .menu-state {
+        /* Клас для стану меню - може бути використаний для зміни стану бургер-меню */
+        outline: none;
       }
 
       .logo {
-        font-weight: 700;
-        font-size: 24px;
+        display: flex;
+        align-items: center;
+        height: 22px;
       }
 
-      .logo span:first-child {
-        color: #e30016;
+      .logo a {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: inherit;
       }
 
-      .logo span:last-child {
+      .logo svg {
+        height: 22px;
+        width: auto;
+        display: block;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .login-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+      }
+
+      .login-button {
+        background: none;
+        border: none;
+        padding: 0;
+        font-size: 15px;
+        color: #181f2f;
+        cursor: pointer;
+        transition: color 0.2s;
+        font-family: inherit;
+        font-weight: 400;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .login-button:hover {
         color: #0b63ce;
       }
 
+      .link-plain {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .reset {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: none;
+        font: inherit;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
+
       nav {
-        display: flex;
-        gap: 24px;
-        font-size: 15px;
-        color: #4a566b;
+        display: none;
       }
 
       .hero {
@@ -94,7 +238,188 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
         gap: 48px;
+        align-items: start;
+      }
+
+      .hero-content {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+      }
+
+      .hero-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .hero-feature {
+        display: flex;
         align-items: center;
+        gap: 12px;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 12px;
+        border: 1px solid rgba(11, 99, 206, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .hero-feature:hover {
+        background: #fff;
+        border-color: #0b63ce;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(11, 99, 206, 0.15);
+      }
+
+      .hero-feature-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #0b63ce, #0ab844);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+      }
+
+      .hero-feature-text {
+        flex: 1;
+      }
+
+      .hero-feature-text strong {
+        display: block;
+        font-size: 15px;
+        margin-bottom: 4px;
+        color: #181f2f;
+      }
+
+      .hero-feature-text span {
+        font-size: 13px;
+        color: #6b7287;
+      }
+
+      .popular-services {
+        margin-top: 32px;
+        padding: 24px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 16px;
+        border: 1px solid rgba(11, 99, 206, 0.1);
+      }
+
+      .popular-services h3 {
+        margin: 0 0 16px;
+        font-size: 18px;
+        color: #181f2f;
+      }
+
+      .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+      }
+
+      .service-item {
+        padding: 14px;
+        background: #fff;
+        border-radius: 10px;
+        border: 1px solid #e8edf5;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+
+      .service-item:hover {
+        border-color: #0b63ce;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(11, 99, 206, 0.1);
+      }
+
+      .service-item-icon {
+        font-size: 28px;
+        margin-bottom: 8px;
+        display: block;
+      }
+
+      .service-item-text {
+        font-size: 13px;
+        color: #4a566b;
+        font-weight: 500;
+      }
+
+      .info-banner {
+        margin-top: 24px;
+        padding: 20px;
+        background: linear-gradient(135deg, rgba(11, 99, 206, 0.08), rgba(227, 0, 22, 0.08));
+        border-radius: 12px;
+        border-left: 4px solid #0b63ce;
+      }
+
+      .info-banner h4 {
+        margin: 0 0 8px;
+        font-size: 16px;
+        color: #181f2f;
+      }
+
+      .info-banner p {
+        margin: 0;
+        font-size: 14px;
+        color: #56607a;
+        line-height: 1.5;
+      }
+
+      .trust-badges {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-top: 24px;
+        align-items: center;
+      }
+
+      .trust-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 8px;
+        font-size: 13px;
+        color: #4a566b;
+        border: 1px solid rgba(11, 99, 206, 0.1);
+      }
+
+      .trust-badge-icon {
+        font-size: 18px;
+      }
+
+      /* Додаткові стилі для кращого відображення */
+      @media (min-width: 1024px) {
+        .hero-inner {
+          grid-template-columns: 1.2fr 0.8fr;
+        }
+
+        .hero-features {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .services-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+
+      @media (min-width: 768px) and (max-width: 1023px) {
+        .hero-features {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .services-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
       }
 
       .hero h1 {
@@ -250,7 +575,8 @@
       .payment-wrapper {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 32px;
+        gap: 40px;
+        margin-top: 32px;
       }
 
       .payment-info,
@@ -268,11 +594,27 @@
         font-size: 24px;
       }
 
+      .payment-info p {
+        margin: 0 0 20px;
+      }
+
       .payment-info ul {
         margin: 0;
         padding-left: 18px;
         color: #5b6378;
         line-height: 1.5;
+      }
+
+      .payment-info ul li {
+        margin-bottom: 12px;
+      }
+
+      .payment-info ul li:last-child {
+        margin-bottom: 0;
+      }
+
+      .payment-info .badge {
+        margin-bottom: 16px;
       }
 
       .badge {
@@ -476,10 +818,10 @@
 
       @keyframes shimmer {
         0% {
-          background-position: -1000px 0;
+          transform: translateX(-100%);
         }
         100% {
-          background-position: 1000px 0;
+          transform: translateX(100%);
         }
       }
 
@@ -575,9 +917,31 @@
         height: 100%;
         background: linear-gradient(90deg, #0b63ce, #0ab844);
         border-radius: 10px;
-        transition: width 0.6s ease;
+        transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        will-change: width;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+      }
+
+      .progress-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
         animation: shimmer 2s infinite;
-        background-size: 200% 100%;
+        will-change: transform;
+        transform: translateZ(0);
+        backface-visibility: hidden;
       }
 
       /* Toast notification */
@@ -684,30 +1048,6 @@
       }
 
       /* Hover effects */
-      nav span {
-        cursor: pointer;
-        transition: color 0.2s;
-        position: relative;
-      }
-
-      nav span:hover {
-        color: #0b63ce;
-      }
-
-      nav span::after {
-        content: "";
-        position: absolute;
-        bottom: -4px;
-        left: 0;
-        width: 0;
-        height: 2px;
-        background: #0b63ce;
-        transition: width 0.3s;
-      }
-
-      nav span:hover::after {
-        width: 100%;
-      }
 
       .primary-btn:hover,
       .secondary-btn:hover {
@@ -739,6 +1079,50 @@
       }
       .delivery-flow ol li:nth-child(3) {
         animation-delay: 0.5s;
+      }
+
+      /* Анімації для нових елементів hero */
+      .hero-feature {
+        animation: fadeInUp 0.5s ease-out;
+        animation-fill-mode: both;
+      }
+
+      .hero-feature:nth-child(1) {
+        animation-delay: 0.1s;
+      }
+
+      .hero-feature:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .hero-feature:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+
+      .popular-services {
+        animation: fadeInUp 0.6s ease-out;
+        animation-delay: 0.4s;
+        animation-fill-mode: both;
+      }
+
+      .info-banner {
+        animation: fadeInUp 0.6s ease-out;
+        animation-delay: 0.5s;
+        animation-fill-mode: both;
+      }
+
+      .trust-badges {
+        animation: fadeInUp 0.6s ease-out;
+        animation-delay: 0.6s;
+        animation-fill-mode: both;
+      }
+
+      .service-item {
+        transition: all 0.2s ease;
+      }
+
+      .service-item:active {
+        transform: scale(0.98);
       }
 
       /* Login Modal */
@@ -842,19 +1226,42 @@
       }
 
       @media (max-width: 720px) {
-        header {
+        .header .inner {
           padding: 0 max(20px, calc(20px + env(safe-area-inset-left)));
           padding-right: max(20px, calc(20px + env(safe-area-inset-right)));
           padding-top: max(0px, env(safe-area-inset-top));
         }
 
-        nav {
-          display: none;
+        .ml-32 {
+          margin-left: 16px;
         }
+
 
         .hero {
           padding: 40px max(20px, calc(20px + env(safe-area-inset-left))) 68px;
           padding-right: max(20px, calc(20px + env(safe-area-inset-right)));
+        }
+
+        .hero-inner {
+          grid-template-columns: 1fr;
+          gap: 32px;
+        }
+
+        .hero-features {
+          grid-template-columns: 1fr;
+        }
+
+        .services-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .trust-badges {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .trust-badge {
+          justify-content: center;
         }
 
         main {
@@ -872,6 +1279,18 @@
           bottom: max(20px, calc(20px + env(safe-area-inset-bottom)));
           left: max(20px, calc(20px + env(safe-area-inset-left)));
           max-width: none;
+        }
+
+        .order-card {
+          position: static !important;
+        }
+
+        .logo {
+          height: 20px;
+        }
+
+        .logo svg {
+          height: 20px;
         }
       }
 
@@ -908,11 +1327,12 @@
         min-height: -webkit-fill-available;
       }
 
-      body.telegram-webview header {
+      body.telegram-webview .main-header {
         /* Фіксований header в Telegram */
-        position: sticky;
-        top: 0;
         backdrop-filter: blur(10px);
+      }
+
+      body.telegram-webview .header {
         background: rgba(255, 255, 255, 0.95);
       }
 
@@ -986,6 +1406,40 @@
         display: block;
       }
 
+      /* Приховати блоки до завантаження замовлення */
+      .order-content-hidden {
+        display: none !important;
+      }
+
+      .order-content-visible {
+        animation: fadeInUp 0.6s ease-out;
+      }
+
+      main.order-content-visible {
+        display: block !important;
+      }
+
+      .hero-actions.order-content-visible {
+        display: flex !important;
+      }
+
+      .stats.order-content-visible {
+        display: flex !important;
+      }
+
+      .hero .order-card.order-content-visible {
+        display: flex !important;
+      }
+
+      /* Приховати footer до завантаження замовлення */
+      footer.order-content-hidden {
+        display: none !important;
+      }
+
+      footer.order-content-visible {
+        display: block !important;
+      }
+
       /* Виправлення для мобільних пристроїв в Telegram */
       @media (max-width: 720px) {
         body.telegram-webview .hero {
@@ -1040,81 +1494,203 @@
     </style>
 </head>
 <body>
-    <header>
-      <div class="topbar">
-        <div class="logo"><span>Гос</span><span>услуги</span></div>
-        <nav>
-          <span>Каталог</span>
-          <span>Заказы</span>
-          <span>Оплата</span>
-          <span>Проверка квитанций</span>
-        </nav>
-        <div style="display: flex; gap: 12px; align-items: center;">
+    <header class="main-header">
+      <div class="header">
+        <div class="inner container-d flex-container justify-between align-items-center">
+          <div class="flex-container align-items-center">
+            <button class="reset burger menu-state mr-16" role="button" tabindex="1" aria-label="Каталог" onclick="showToast('Открыть каталог', 'info')">
+              <i class="burger-icon" style="mask-image: url(https://gu-st.ru/content/lib/icons/text_symbols_menu_items/b24.svg); -webkit-mask-image: url(https://gu-st.ru/content/lib/icons/text_symbols_menu_items/b24.svg);"></i>
+              <p class="visually-hidden">Каталог</p>
+            </button>
+            <div class="logo">
+              <a href="#" aria-label="Госуслуги главная" role="link" tabindex="2" onclick="event.preventDefault(); window.scrollTo({top: 0, behavior: 'smooth'});">
+                <svg xmlns="http://www.w3.org/2000/svg" width="124" height="22" viewBox="0 0 124 22" fill="none">
+                  <path d="M71.7498 16.3847H68.3078C68.1927 16.3847 68.109 16.273 68.1404 16.1613C68.7158 14.2027 69.3156 11.9857 69.7306 9.52792C70.1561 6.98627 70.3793 4.64363 70.4734 2.55235C70.4769 2.45809 70.5536 2.38477 70.6478 2.38477H80.8769C80.9733 2.38477 81.0514 2.46293 81.0514 2.55934V16.2102C81.0514 16.3066 80.9733 16.3847 80.8769 16.3847H77.5253C77.4288 16.3847 77.3507 16.3066 77.3507 16.2102V5.66657H73.9862C73.8625 7.22257 73.654 8.89451 73.3121 10.659C72.9146 12.7259 72.4438 14.6007 71.9137 16.266C71.8928 16.3359 71.823 16.3847 71.7498 16.3847Z" fill="#EE2F53"></path>
+                  <path d="M0 2.55934C0 2.46293 0.0781548 2.38477 0.174564 2.38477H10.0567C10.1801 2.38477 10.2636 2.5119 10.2157 2.62682L8.9919 5.55996C8.95958 5.63743 8.88566 5.67268 8.81548 5.6657C8.80973 5.66628 8.8039 5.66657 8.798 5.66657H3.70075V16.2102C3.70075 16.3066 3.62259 16.3847 3.52618 16.3847H0.174564C0.0781548 16.3847 0 16.3066 0 16.2102V2.55934Z" fill="#0066B3"></path>
+                  <path d="M99.3223 2.55934C99.3223 2.46293 99.4005 2.38477 99.4969 2.38477H109.379C109.502 2.38477 109.586 2.5119 109.538 2.62682L108.314 5.55996C108.282 5.63743 108.208 5.67268 108.138 5.6657C108.132 5.66628 108.126 5.66657 108.12 5.66657H103.023V16.2102C103.023 16.3066 102.945 16.3847 102.848 16.3847H99.4969C99.4005 16.3847 99.3223 16.3066 99.3223 16.2102V2.55934Z" fill="#EE2F53"></path>
+                  <path d="M39.9967 2.38477C39.8756 2.38477 39.7914 2.50394 39.833 2.61645L44.9253 16.387C44.2067 17.8978 43.4084 19.488 42.4953 21.2606C42.4355 21.3766 42.5188 21.5169 42.6496 21.5169H46.2722C46.338 21.5169 46.3987 21.4792 46.4284 21.4206C49.109 15.9658 51.0816 11.1304 53.7785 2.61545C53.8153 2.50288 53.732 2.38477 53.6134 2.38477H50.2486C50.1705 2.38477 50.1015 2.43794 50.0802 2.51287C49.0418 6.15312 48.0845 9.00243 46.9748 11.7484L43.5539 2.49796C43.5288 2.42998 43.4634 2.38477 43.3903 2.38477H39.9967Z" fill="#EE2F53"></path>
+                  <path d="M83.319 2.38477C83.1979 2.38477 83.1137 2.50394 83.1553 2.61645L88.2476 16.387C87.5291 17.8978 86.7307 19.488 85.8176 21.2606C85.7578 21.3766 85.8411 21.5169 85.9719 21.5169H89.5945C89.6603 21.5169 89.721 21.4792 89.7507 21.4206C92.4313 15.9658 94.4039 11.1304 97.1009 2.61545C97.1376 2.50288 97.0543 2.38477 96.9357 2.38477H93.5709C93.4928 2.38477 93.4238 2.43794 93.4025 2.51287C92.3641 6.15312 91.4068 9.00243 90.2971 11.7484L86.8762 2.49796C86.8511 2.42998 86.7857 2.38477 86.7126 2.38477H83.319Z" fill="#EE2F53"></path>
+                  <path d="M65.5508 13.0804C65.5335 13.0355 65.4989 12.9976 65.4538 12.9769C65.4088 12.9562 65.3568 12.9562 65.3118 12.97C64.5081 13.2667 63.0011 13.5081 61.9514 13.5081C59.6545 13.5081 58.5597 12.8906 58.5597 9.38232C58.5597 6.57773 58.8958 5.2565 61.9514 5.2565C62.8175 5.2565 63.6212 5.38069 64.6432 5.67736C64.7263 5.70151 64.8164 5.66356 64.8545 5.58767C65.2356 4.87359 65.6963 4.00082 66.216 2.93141C66.2403 2.88312 66.2403 2.82792 66.2195 2.77963C66.1987 2.73133 66.1571 2.69339 66.1051 2.67614C64.761 2.24838 63.157 2 61.7123 2C56.9003 2 54.7559 4.25954 54.7559 9.33058C54.7559 14.4741 56.9003 16.7681 61.7123 16.7681C62.9179 16.7681 65.2945 16.5163 66.4412 16.0609C66.5313 16.023 66.5798 15.9195 66.5451 15.8298L65.5508 13.0804Z" fill="#EE2F53"></path>
+                  <path d="M37.3946 13.0804C37.3772 13.0355 37.3426 12.9976 37.2976 12.9769C37.2525 12.9562 37.2006 12.9562 37.1555 12.97C36.3518 13.2667 34.8448 13.5081 33.7951 13.5081C31.4982 13.5081 30.4035 12.8906 30.4035 9.38232C30.4035 6.57773 30.7395 5.2565 33.7951 5.2565C34.6612 5.2565 35.4649 5.38069 36.4869 5.67736C36.57 5.70151 36.6601 5.66356 36.6982 5.58767C37.0793 4.87359 37.5401 4.00082 38.0597 2.93141C38.084 2.88312 38.084 2.82792 38.0632 2.77963C38.0424 2.73133 38.0008 2.69339 37.9489 2.67614C36.6047 2.24838 35.0007 2 33.556 2C28.744 2 26.5996 4.25954 26.5996 9.33058C26.5996 14.4741 28.744 16.7681 33.556 16.7681C34.7616 16.7681 37.1382 16.5163 38.2849 16.0609C38.375 16.023 38.4235 15.9195 38.3888 15.8298L37.3946 13.0804Z" fill="#0066B3"></path>
+                  <path d="M17.5801 2C12.8757 2 11.0439 4.0549 11.0439 9.32997C11.0439 14.6853 12.8757 16.7681 17.5801 16.7681C22.3222 16.7681 24.1711 14.6853 24.1711 9.32997C24.1711 4.0549 22.3222 2 17.5801 2ZM17.5801 13.6945C15.4368 13.6945 14.7691 13.1014 14.7691 9.3823C14.7691 5.42251 15.4984 5.07014 17.5801 5.07014C19.7029 5.07014 20.4459 5.42251 20.4459 9.3823C20.4459 13.1014 19.7646 13.6945 17.5801 13.6945Z" fill="#0066B3"></path>
+                  <path d="M123.41 2.38477H120.061C119.963 2.38477 119.886 2.46141 119.886 2.55896V13.1075C119.16 13.3095 118.435 13.407 117.618 13.407C115.587 13.407 114.998 12.8357 114.921 10.4529V2.55896C114.921 2.46141 114.844 2.38477 114.746 2.38477H111.397C111.299 2.38477 111.222 2.46141 111.222 2.55896V2.57986C111.222 2.57986 111.222 10.5191 111.226 10.5295C111.306 15.013 112.932 16.7688 116.948 16.7688C119.293 16.7688 121.91 16.1731 123.463 15.5809C123.536 15.5565 123.581 15.4868 123.581 15.4102V2.57986V2.55896C123.585 2.46141 123.508 2.38477 123.41 2.38477Z" fill="#EE2F53"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+          <div class="flex-container justify-end align-items-center">
+            <div class="ml-32 login-wrapper flex-container justify-end overflow-container">
+              <button class="reset link-plain login-button" role="button" tabindex="3" onclick="showToast('Вход в личный кабинет', 'info')">Войти</button>
+            </div>
+          </div>
         </div>
       </div>
     </header>
 
     <section class="hero">
       <div class="hero-inner">
-        <div>
-          <div class="badge">Онлайн-оплата через Госуслуги</div>
-          <h1>Официальная оплата товара из Telegram-канала.</h1>
-          <p>
-            Мы оформили заявку в стиле Госуслуг: заказ из Telegram-канала переносится в
-            защищённый кабинет, где оплата фиксируется, статус обновляется, а квитанция
-            проверяется оператором в вашем чате.
-          </p>
-          <div class="order-input-container">
-            <label>Введите номер заказа:</label>
-            <div class="order-input-wrapper">
-              <input 
-                type="text" 
-                id="orderNumberInput" 
-                placeholder="TG-XXXXX" 
-                onkeypress="if(event.key==='Enter') loadOrderData()"
-              />
-              <button 
-                class="primary-btn order-load-btn" 
-                onclick="loadOrderData()"
-              >
-                Загрузить
-              </button>
+        <div class="hero-content">
+          <div>
+            <div class="badge">Онлайн-оплата через Госуслуги</div>
+            <h1>Официальная оплата товара из Telegram-канала.</h1>
+            <p class="order-description">
+              Мы оформили заявку в стиле Госуслуг: заказ из Telegram-канала переносится в
+              защищённый кабинет, где оплата фиксируется, статус обновляется, а квитанция
+              проверяется оператором в вашем чате.
+            </p>
+            
+            <div class="hero-features">
+              <div class="hero-feature">
+                <div class="hero-feature-icon">🔒</div>
+                <div class="hero-feature-text">
+                  <strong>Защищённая оплата</strong>
+                  <span>Все платежи через официальные системы</span>
+                </div>
+              </div>
+              <div class="hero-feature">
+                <div class="hero-feature-icon">⚡</div>
+                <div class="hero-feature-text">
+                  <strong>Быстрая проверка</strong>
+                  <span>Подтверждение за 3 минуты</span>
+                </div>
+              </div>
+              <div class="hero-feature">
+                <div class="hero-feature-icon">📱</div>
+                <div class="hero-feature-text">
+                  <strong>Удобный интерфейс</strong>
+                  <span>Работает в Telegram WebView</span>
+                </div>
+              </div>
             </div>
-            <div id="orderError" class="order-error"></div>
-          </div>
-          <div class="hero-actions">
-            <button class="primary-btn">Перейти в Telegram</button>
-            <button class="secondary-btn">Пошаговая инструкция</button>
-          </div>
-          <div class="stats">
-            <div class="stat">
-              <strong>24/7</strong>
-              проверка квитанций
+
+            <div class="order-input-container" id="orderInputContainer">
+              <label>Введите номер заказа:</label>
+              <div class="order-input-wrapper">
+                <input 
+                  type="text" 
+                  id="orderNumberInput" 
+                  placeholder="TG-XXXXX" 
+                  onkeypress="if(event.key==='Enter') loadOrderData()"
+                />
+                <button 
+                  class="primary-btn order-load-btn" 
+                  onclick="loadOrderData()"
+                >
+                  Загрузить
+                </button>
+              </div>
+              <div id="orderError" class="order-error"></div>
             </div>
-            <div class="stat">
-              <strong>3 мин</strong>
-              среднее подтверждение
+
+            <div class="popular-services">
+              <h3>Популярные услуги</h3>
+              <div class="services-grid">
+                <a href="#" class="service-item" onclick="event.preventDefault(); showToast('Каталог услуг', 'info');">
+                  <span class="service-item-icon">📋</span>
+                  <span class="service-item-text">Каталог услуг</span>
+                </a>
+                <a href="#" class="service-item" onclick="event.preventDefault(); showToast('Мои заказы', 'info');">
+                  <span class="service-item-icon">📦</span>
+                  <span class="service-item-text">Мои заказы</span>
+                </a>
+                <a href="#" class="service-item" onclick="event.preventDefault(); showToast('Проверка квитанций', 'info');">
+                  <span class="service-item-icon">✅</span>
+                  <span class="service-item-text">Проверка квитанций</span>
+                </a>
+                <a href="#" class="service-item" onclick="event.preventDefault(); showToast('Поддержка', 'info');">
+                  <span class="service-item-icon">💬</span>
+                  <span class="service-item-text">Поддержка</span>
+                </a>
+              </div>
             </div>
-            <div class="stat">
-              <strong>9 500+</strong>
-              защищённых заказов
+
+            <div class="info-banner">
+              <h4>ℹ️ Как это работает</h4>
+              <p>
+                После оплаты заказа вы получите квитанцию. Отправьте её оператору в Telegram-бот 
+                <strong>@gosuslugi_support_bot</strong> для проверки. После подтверждения оплаты 
+                ваш заказ будет отправлен в течение 24 часов.
+              </p>
+            </div>
+
+            <div class="trust-badges">
+              <div class="trust-badge">
+                <span class="trust-badge-icon">🛡️</span>
+                <span>Защищённые платежи</span>
+              </div>
+              <div class="trust-badge">
+                <span class="trust-badge-icon">✓</span>
+                <span>Официальный сервис</span>
+              </div>
+              <div class="trust-badge">
+                <span class="trust-badge-icon">🔐</span>
+                <span>SSL шифрование</span>
+              </div>
+            </div>
+
+            <div class="hero-actions order-content-hidden" id="heroActions">
+              <button class="primary-btn">Перейти в Telegram</button>
+              <button class="secondary-btn">Пошаговая инструкция</button>
+            </div>
+            <div class="stats order-content-hidden" id="heroStats">
+              <div class="stat">
+                <strong>24/7</strong>
+                проверка квитанций
+              </div>
+              <div class="stat">
+                <strong>3 мин</strong>
+                среднее подтверждение
+              </div>
+              <div class="stat">
+                <strong>9 500+</strong>
+                защищённых заказов
+              </div>
             </div>
           </div>
         </div>
-        <div class="order-card" style="box-shadow: 0 20px 40px rgba(12, 44, 78, 0.15);">
-          <span>Заявка № TG-28451</span>
-          <strong>Телеграм-канал «ШТОРМ | Товары для СВО»</strong>
-          <span>Товар: Смарт-часы · Доставка: Карго → Москва → СДЭК</span>
-          <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
-            <div class="badge" style="background: rgba(10, 184, 68, 0.12); color: #0ab844">
-              Статус заявки: Подтверждена
+        <div>
+          <div class="order-card order-content-hidden" id="heroOrderCard" style="box-shadow: 0 20px 40px rgba(12, 44, 78, 0.15); position: sticky; top: 80px;">
+            <span>Заявка № TG-28451</span>
+            <strong>Телеграм-канал «ШТОРМ | Товары для СВО»</strong>
+            <span>Товар: Смарт-часы · Доставка: Карго → Москва → СДЭК</span>
+            <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
+              <div class="badge" style="background: rgba(10, 184, 68, 0.12); color: #0ab844">
+                Статус заявки: Подтверждена
+              </div>
             </div>
+          </div>
+          
+          <div class="popular-services" style="margin-top: 24px;">
+            <h3>Быстрые ссылки</h3>
+            <div class="services-grid" style="grid-template-columns: 1fr;">
+              <a href="#" class="service-item" onclick="event.preventDefault(); showToast('Инструкция по оплате', 'info');" style="text-align: left; display: flex; align-items: center; gap: 12px;">
+                <span class="service-item-icon" style="margin: 0;">📖</span>
+                <span class="service-item-text">Инструкция по оплате</span>
+              </a>
+              <a href="#" class="service-item" onclick="event.preventDefault(); showToast('Часто задаваемые вопросы', 'info');" style="text-align: left; display: flex; align-items: center; gap: 12px;">
+                <span class="service-item-icon" style="margin: 0;">❓</span>
+                <span class="service-item-text">Часто задаваемые вопросы</span>
+              </a>
+              <a href="#" class="service-item" onclick="event.preventDefault(); showToast('Контакты поддержки', 'info');" style="text-align: left; display: flex; align-items: center; gap: 12px;">
+                <span class="service-item-icon" style="margin: 0;">📞</span>
+                <span class="service-item-text">Контакты поддержки</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="info-banner" style="margin-top: 24px; background: linear-gradient(135deg, rgba(10, 184, 68, 0.08), rgba(11, 99, 206, 0.08)); border-left-color: #0ab844;">
+            <h4>💡 Полезная информация</h4>
+            <p>
+              Все платежи обрабатываются через защищённые платёжные системы. 
+              Ваши данные защищены и не передаются третьим лицам. 
+              При возникновении вопросов обращайтесь в поддержку.
+            </p>
           </div>
         </div>
       </div>
     </section>
 
-    <main>
+    <main class="order-content-hidden" id="mainContent" style="display: none;">
       <section class="order-overview">
         <div>
           <div class="badge">Шаг 1 · Заявка оформлена</div>
@@ -1271,7 +1847,7 @@
       </section>
     </main>
 
-    <footer>
+    <footer class="order-content-hidden" id="footerContent">
       © 2025 Госуслуги · Интеграция с Telegram-каналами · Пользовательское соглашение · Политика
       конфиденциальности
     </footer>
@@ -1575,9 +2151,16 @@
         }
         if (recipientNameEl) recipientNameEl.textContent = data.order.recipient || "Андрей Коваленко";
         if (deliveryAddressEl) {
-          const deliveryText = data.order.deliveryAddress 
-            ? `Карго → Москва → СДЭК: ${data.order.deliveryAddress}`
-            : "Карго: до Москвы · СДЭК до двери";
+          let deliveryText = "Карго: до Москвы · СДЭК до двери";
+          if (data.order.deliveryAddress) {
+            const address = data.order.deliveryAddress;
+            // Перевіряємо, чи адреса вже містить префікс "Карго → Москва → СДЭК"
+            if (address.includes("Карго → Москва → СДЭК")) {
+              deliveryText = address;
+            } else {
+              deliveryText = `Карго → Москва → СДЭК: ${address}`;
+            }
+          }
           deliveryAddressEl.textContent = deliveryText;
         }
         if (orderStatus) orderStatus.textContent = data.order.status || "Ожидает оплаты";
@@ -1585,6 +2168,43 @@
         // Update payment module title
         const paymentTitle = document.querySelector(".payment-module h3");
         if (paymentTitle) paymentTitle.textContent = `Оплата заказа ${data.order.number || "TG-28451"}`;
+
+        // Показати приховані блоки після завантаження замовлення
+        const heroActions = document.getElementById("heroActions");
+        const heroStats = document.getElementById("heroStats");
+        const heroOrderCard = document.getElementById("heroOrderCard");
+        const mainContent = document.getElementById("mainContent");
+
+        if (heroActions) {
+          heroActions.classList.remove("order-content-hidden");
+          heroActions.classList.add("order-content-visible");
+        }
+        if (heroStats) {
+          heroStats.classList.remove("order-content-hidden");
+          heroStats.classList.add("order-content-visible");
+        }
+        if (heroOrderCard) {
+          heroOrderCard.classList.remove("order-content-hidden");
+          heroOrderCard.classList.add("order-content-visible");
+        }
+        if (mainContent) {
+          mainContent.classList.remove("order-content-hidden");
+          mainContent.classList.add("order-content-visible");
+        }
+
+        // Показати footer
+        const footerContent = document.getElementById("footerContent");
+        if (footerContent) {
+          footerContent.classList.remove("order-content-hidden");
+          footerContent.classList.add("order-content-visible");
+        }
+
+        // Плавно прокрутити до контенту
+        setTimeout(() => {
+          if (mainContent) {
+            mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 300);
       }
 
       // Load data from admin panel (legacy, for backward compatibility)
@@ -1630,9 +2250,16 @@
           }
           if (recipientNameEl) recipientNameEl.textContent = data.order.recipient || "Андрей Коваленко";
           if (deliveryAddressEl) {
-            const deliveryText = data.order.deliveryAddress 
-              ? `Карго → Москва → СДЭК: ${data.order.deliveryAddress}`
-              : "Карго: до Москвы · СДЭК до двери";
+            let deliveryText = "Карго: до Москвы · СДЭК до двери";
+            if (data.order.deliveryAddress) {
+              const address = data.order.deliveryAddress;
+              // Перевіряємо, чи адреса вже містить префікс "Карго → Москва → СДЭК"
+              if (address.includes("Карго → Москва → СДЭК")) {
+                deliveryText = address;
+              } else {
+                deliveryText = `Карго → Москва → СДЭК: ${address}`;
+              }
+            }
             deliveryAddressEl.textContent = deliveryText;
           }
           if (orderStatus) orderStatus.textContent = data.order.status || "Ожидает оплаты";
@@ -1706,6 +2333,12 @@
 
       // Animate stats on load
       window.addEventListener("load", () => {
+        // Переконатися, що всі блоки приховані за замовчуванням
+        const hiddenElements = document.querySelectorAll('.order-content-hidden');
+        hiddenElements.forEach(el => {
+          el.style.display = 'none';
+        });
+
         // Check URL parameter for order number
         const urlParams = new URLSearchParams(window.location.search);
         const orderNumberFromUrl = urlParams.get("order");
@@ -1716,10 +2349,8 @@
             orderInput.value = orderNumberFromUrl;
             loadOrderData();
           }
-        } else {
-          // Load admin data first (legacy)
-          loadAdminData();
         }
+        // Не завантажуємо admin data автоматично - користувач має ввести номер замовлення
 
         // Update planLabels from loaded data
         const data = JSON.parse(localStorage.getItem("adminData") || "{}");
@@ -1934,9 +2565,9 @@
         // Налаштування кнопки "Назад"
         if (tg.BackButton) {
           tg.BackButton.show();
-          tg.BackButton.onClick(() => {
-            tg.close();
-          });
+        tg.BackButton.onClick(() => {
+          tg.close();
+        });
         }
         
         // Виправлення viewport для Telegram WebView

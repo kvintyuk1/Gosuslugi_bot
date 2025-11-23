@@ -8,21 +8,61 @@ const DB_FILE = path.join(__dirname, "orders.json");
 
 // In-memory база даних
 let orders = [];
+let lastModifiedTime = 0; // Час останньої модифікації файлу
+
+// Отримати час модифікації файлу
+function getFileModificationTime() {
+  try {
+    if (fs.existsSync(DB_FILE)) {
+      const stats = fs.statSync(DB_FILE);
+      return stats.mtimeMs;
+    }
+  } catch (error) {
+    // Ігноруємо помилки
+  }
+  return 0;
+}
+
+// Перевірити чи потрібно перезавантажити базу даних
+function needsReload() {
+  const currentModTime = getFileModificationTime();
+  // Завжди перезавантажувати, якщо файл існує і час модифікації відрізняється
+  // Це важливо, оскільки бот і сервер - різні процеси
+  if (currentModTime > 0 && currentModTime !== lastModifiedTime) {
+    return true;
+  }
+  return false;
+}
 
 // Завантажити дані з файлу
-function loadDatabase() {
+function loadDatabase(silent = false) {
   try {
+    console.log(`📂 Шлях до файлу БД: ${DB_FILE}`);
+    console.log(`📂 Файл існує: ${fs.existsSync(DB_FILE)}`);
+    
     if (fs.existsSync(DB_FILE)) {
       const data = fs.readFileSync(DB_FILE, "utf8");
       orders = JSON.parse(data);
-      console.log(`✅ Завантажено ${orders.length} замовлень з файлу`);
+      lastModifiedTime = getFileModificationTime();
+      
+      if (!silent) {
+        console.log(`✅ Завантажено ${orders.length} замовлень з файлу ${DB_FILE}`);
+        if (orders.length > 0) {
+          console.log(`📝 Перші 3 номери: ${orders.slice(0, 3).map(o => o.orderNumber).join(', ')}`);
+        }
+      }
     } else {
+      console.log(`⚠️ Файл ${DB_FILE} не існує, створюємо новий`);
       orders = [];
       saveDatabase(); // Створити порожній файл
-      console.log("✅ Створено нову базу даних");
+      if (!silent) {
+        console.log("✅ Створено нову базу даних");
+      }
     }
   } catch (error) {
     console.error("❌ Помилка завантаження бази даних:", error);
+    console.error("❌ Деталі помилки:", error.message);
+    console.error("❌ Stack:", error.stack);
     orders = [];
   }
 }
@@ -31,6 +71,8 @@ function loadDatabase() {
 function saveDatabase() {
   try {
     fs.writeFileSync(DB_FILE, JSON.stringify(orders, null, 2), "utf8");
+    // Оновити час модифікації після збереження
+    lastModifiedTime = getFileModificationTime();
   } catch (error) {
     console.error("❌ Помилка збереження бази даних:", error);
   }
@@ -41,13 +83,57 @@ loadDatabase();
 
 // Функції для роботи з замовленнями
 
+// Генерація номера замовлення
+function generateOrderNumber() {
+  // Завжди перезавантажувати перед генерацією для актуальності
+  loadDatabase(true); // Тихий режим для автоматичного перезавантаження
+  
+  // Знайти найбільший номер замовлення
+  let maxNumber = 0;
+  orders.forEach((order) => {
+    const match = order.orderNumber.match(/TG-(\d+)/);
+    if (match) {
+      const num = parseInt(match[1], 10);
+      if (num > maxNumber) {
+        maxNumber = num;
+      }
+    }
+  });
+  
+  // Згенерувати новий номер (наступний після максимального)
+  const newNumber = maxNumber + 1;
+  return `TG-${newNumber.toString().padStart(5, '0')}`;
+}
+
 // Знайти замовлення за номером
 function findOrder(orderNumber) {
-  return orders.find((o) => o.orderNumber === orderNumber.toUpperCase());
+  // Завжди перезавантажувати перед пошуком для гарантії актуальності
+  // (бот і сервер - різні процеси, тому потрібно завжди читати з файлу)
+  loadDatabase(true); // Тихий режим для автоматичного перезавантаження
+  
+  const searchNumber = orderNumber.toUpperCase();
+  console.log(`🔎 findOrder: шукаємо "${searchNumber}", всього замовлень: ${orders.length}`);
+  
+  const found = orders.find((o) => {
+    const match = o.orderNumber === searchNumber;
+    if (match) {
+      console.log(`✅ Знайдено збіг: ${o.orderNumber} === ${searchNumber}`);
+    }
+    return match;
+  });
+  
+  if (!found) {
+    console.log(`❌ Не знайдено замовлення "${searchNumber}"`);
+    console.log(`📋 Доступні номери: ${orders.map(o => o.orderNumber).join(', ')}`);
+  }
+  
+  return found;
 }
 
 // Знайти всі замовлення
 function findAllOrders() {
+  // Завжди перезавантажувати перед пошуком для гарантії актуальності
+  loadDatabase(true); // Тихий режим для автоматичного перезавантаження
   return [...orders]; // Повертаємо копію масиву
 }
 
@@ -65,6 +151,8 @@ function addOrder(order) {
     productName: order.productName,
     composition: order.composition || "",
     deliveryAddress: order.deliveryAddress,
+    price: order.price || 0,
+    sellerName: order.sellerName || "",
     status: order.status || "Ожидает оплаты",
     createdAt: order.createdAt || new Date().toISOString(),
     updatedAt: order.updatedAt || new Date().toISOString(),
@@ -106,6 +194,8 @@ function deleteOrder(orderNumber) {
 
 // Знайти замовлення за отримувачем (для користувачів)
 function findOrdersByRecipient(recipientName) {
+  // Завжди перезавантажувати перед пошуком для гарантії актуальності
+  loadDatabase(true); // Тихий режим для автоматичного перезавантаження
   return orders.filter(
     (o) =>
       o.recipientName &&
@@ -115,6 +205,8 @@ function findOrdersByRecipient(recipientName) {
 
 // Знайти замовлення за каналом
 function findOrdersByChannel(channelName) {
+  // Завжди перезавантажувати перед пошуком для гарантії актуальності
+  loadDatabase(true); // Тихий режим для автоматичного перезавантаження
   return orders.filter(
     (o) =>
       o.channelName &&
@@ -124,6 +216,8 @@ function findOrdersByChannel(channelName) {
 
 // Отримати останні N замовлень
 function getRecentOrders(limit = 10) {
+  // Завжди перезавантажувати перед пошуком для гарантії актуальності
+  loadDatabase(true); // Тихий режим для автоматичного перезавантаження
   return orders
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, limit);
@@ -140,5 +234,6 @@ module.exports = {
   getRecentOrders,
   loadDatabase,
   saveDatabase,
+  generateOrderNumber,
 };
 

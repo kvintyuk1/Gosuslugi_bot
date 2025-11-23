@@ -40,11 +40,37 @@ app.use(express.static(path.join(__dirname, "src")));
 app.get("/api/order/:orderNumber", (req, res) => {
   try {
     const orderNumber = req.params.orderNumber.toUpperCase();
-    const order = db.findOrder(orderNumber);
-
-    if (!order) {
-      return res.status(404).json({ error: "Order not found" });
+    console.log(`🔍 Пошук замовлення: ${orderNumber}`);
+    
+    // Перезавантажити базу даних перед пошуком
+    db.loadDatabase();
+    
+    // Отримати всі замовлення для діагностики
+    const allOrders = db.findAllOrders();
+    console.log(`📋 Всього замовлень в базі після перезавантаження: ${allOrders.length}`);
+    if (allOrders.length > 0) {
+      const orderNumbers = allOrders.map(o => o.orderNumber);
+      console.log(`📝 Всі номери замовлень: ${orderNumbers.join(', ')}`);
+      console.log(`🔎 Шукаємо: ${orderNumber}, Знайдено в списку: ${orderNumbers.includes(orderNumber)}`);
     }
+    
+    const order = db.findOrder(orderNumber);
+    
+    if (!order) {
+      console.log(`❌ Замовлення ${orderNumber} не знайдено після пошуку`);
+      return res.status(404).json({ 
+        error: "Order not found",
+        searched: orderNumber,
+        totalOrders: allOrders.length,
+        availableOrders: allOrders.slice(0, 5).map(o => o.orderNumber)
+      });
+    }
+    
+    console.log(`✅ Замовлення ${orderNumber} знайдено:`, {
+      recipient: order.recipientName,
+      product: order.productName,
+      status: order.status
+    });
 
     res.json({
       order: {
@@ -55,6 +81,8 @@ app.get("/api/order/:orderNumber", (req, res) => {
         productName: order.productName,
         composition: order.composition,
         deliveryAddress: order.deliveryAddress,
+        price: order.price || 0,
+        sellerName: order.sellerName || "",
         status: order.status,
       },
     });

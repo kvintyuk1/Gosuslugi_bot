@@ -53,5 +53,18 @@
     "status": "Подтверждена",
     "createdAt": "2025-11-22T11:39:43.266Z",
     "updatedAt": "2025-11-22T11:39:43.266Z"
+  },
+  {
+    "orderNumber": "TG-28457",
+    "recipientName": "Плотникова Юлия Юрьевна",
+    "channelName": "PRIME AUTO",
+    "productName": "Диски Vossen r18",
+    "composition": "",
+    "deliveryAddress": "Новосибирская область. село Убинское, ул.Ленина 40",
+    "price": 42400,
+    "sellerName": "Тарковский Иван Геннадьевич",
+    "status": "Ожидает оплаты",
+    "createdAt": "2025-11-23T11:15:58.070Z",
+    "updatedAt": "2025-11-23T11:15:58.070Z"
   }
 ]
