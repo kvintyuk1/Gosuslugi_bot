@@ -424,16 +424,22 @@ nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
+  background: transparent !important;
+  background-color: transparent !important;
+  overflow: hidden;
+  border-radius: 50%;
   order: 2;
 }
 
 .hero-mascot-wrapper video {
-  background: transparent;
-  background-color: transparent;
-  -webkit-background-color: transparent;
-  mix-blend-mode: normal;
+  background: transparent !important;
+  background-color: transparent !important;
+  -webkit-background-color: transparent !important;
+  mix-blend-mode: screen;
   object-fit: contain;
+  filter: brightness(1.1) contrast(1.1);
+  /* Убираем черный фон через CSS */
+  isolation: isolate;
 }
 
 .hero h1 {
@@ -1366,14 +1372,22 @@ body.telegram-webview .header {
 }
 
 body.telegram-webview .hero-mascot-wrapper {
-  background: transparent;
+  background: transparent !important;
+  background-color: transparent !important;
+  isolation: isolate;
 }
 
 body.telegram-webview .hero-mascot-wrapper video {
   background: transparent !important;
   background-color: transparent !important;
   -webkit-background-color: transparent !important;
-  mix-blend-mode: normal;
+  mix-blend-mode: screen !important;
+  filter: brightness(1.1) contrast(1.1) !important;
+  object-fit: contain !important;
+  isolation: isolate !important;
+  /* Принудительно убираем черный фон */
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
 }
 
 /* Блок введення номера заказа */
