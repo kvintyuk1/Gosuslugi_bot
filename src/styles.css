@@ -423,6 +423,12 @@ nav {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent;
+}
+
+.hero-mascot-wrapper video {
+  background: transparent;
+  background-color: transparent;
 }
 
 .hero h1 {
@@ -1256,6 +1262,8 @@ footer {
   .hero-mascot-wrapper video {
     width: 160px;
     height: 160px;
+    background: transparent;
+    background-color: transparent;
   }
 
   .hero-features {
