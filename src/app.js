@@ -309,6 +309,95 @@
     });
   }
 
+  // Remove black background from video using Canvas with better quality
+  function setupVideoChromaKey(videoId) {
+    const video = document.getElementById(videoId);
+    if (!video) return;
+
+    // Wait for video to be ready
+    const initCanvas = () => {
+      if (video.readyState < 2) {
+        video.addEventListener('loadeddata', initCanvas);
+        return;
+      }
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      const wrapper = video.parentElement;
+      
+      // Set canvas size to match video
+      const videoWidth = video.videoWidth || 150;
+      const videoHeight = video.videoHeight || 150;
+      canvas.width = videoWidth;
+      canvas.height = videoHeight;
+      canvas.style.width = video.style.width || video.width + 'px';
+      canvas.style.height = video.style.height || video.height + 'px';
+      canvas.style.background = 'transparent';
+      canvas.style.position = 'relative';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+      canvas.style.zIndex = '0';
+      
+      // Hide original video but keep it playing
+      video.style.opacity = '0';
+      video.style.position = 'absolute';
+      video.style.pointerEvents = 'none';
+      
+      // Add canvas to wrapper
+      wrapper.style.position = 'relative';
+      wrapper.appendChild(canvas);
+      
+      let animationFrameId;
+      
+      function processFrame() {
+        if (video.readyState >= 2) {
+          // Draw video frame to canvas
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          
+          // Get image data
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+          
+          // Process pixels - remove black/dark pixels with smooth transition
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            
+            // Calculate brightness using luminance formula
+            const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
+            
+            // Smooth transition for black background removal
+            // Threshold: pixels darker than 50 will be made transparent
+            if (brightness < 50) {
+              // Smooth alpha transition
+              const alpha = Math.max(0, (brightness / 50) * 255);
+              data[i + 3] = alpha;
+            }
+          }
+          
+          // Put processed image data back
+          ctx.putImageData(imageData, 0, 0);
+        }
+        
+        // Continue processing frames
+        animationFrameId = requestAnimationFrame(processFrame);
+      }
+      
+      // Start processing frames
+      processFrame();
+      
+      // Cleanup on video end (if needed)
+      video.addEventListener('ended', () => {
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+        }
+      });
+    };
+    
+    initCanvas();
+  }
+
   // Detect Telegram WebView and add class to body
   function detectTelegramWebView() {
     if (window.Telegram && window.Telegram.WebApp) {
@@ -326,6 +415,11 @@
     detectTelegramWebView();
     bindUI();
     setupMascot();
+    
+    // Setup chroma key for hero mascot video after a short delay
+    setTimeout(() => {
+      setupVideoChromaKey('hero-mascot-video');
+    }, 300);
   });
 
   // Expose small API if needed
