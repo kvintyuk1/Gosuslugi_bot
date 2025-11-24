@@ -417,9 +417,8 @@
     setupMascot();
     
     // Setup chroma key for hero mascot video after a short delay
-    setTimeout(() => {
-      setupVideoChromaKey('hero-mascot-video');
-    }, 300);
+    
+    
   });
 
   // Expose small API if needed
